@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VANTSO Güncel Formlar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- TOAST BİLDİRİM KONTEYNERİ -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ==========================================
+       GİRİŞ PANELİ (LOGIN PANEL)
+       ========================================== -->
+  <div id="login-screen" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo-container" style="text-align: center; margin-bottom: 24px;">
+        <img src="images/logo.png" alt="VANTSO Logo" style="max-width: 280px; height: auto;">
+      </div>
+      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: -12px; margin-bottom: 24px;">Van Ticaret ve Sanayi Odası Belge Yönetim Sistemi</p>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">E-posta Adresi</label>
+          <input type="email" id="login-email" required placeholder="örnek@sirket.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Şifre</label>
+          <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary">Giriş Yap</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ANA UYGULAMA PANELİ (MAIN APP)
+       ========================================== -->
+  <div id="app-screen" class="hidden">
+    <!-- Üst Başlık (Header) -->
+    <header class="main-header">
+      <div class="logo-area" id="header-logo" style="display: flex; align-items: center; gap: 14px;">
+        <img src="images/logo.png" alt="VANTSO Logo" style="height: 56px; width: auto; object-fit: contain;">
+        <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #0d3a5f; letter-spacing: -0.3px; font-family: 'Inter', sans-serif;">VANTSO GÜNCEL FORMLAR</h2>
+      </div>
+      
+      <div class="user-profile-area">
+
+        
+        <!-- User Profile Capsule -->
+        <div class="user-profile-capsule" id="profile-trigger">
+          <div class="user-avatar-circle" id="user-avatar-initials">BD</div>
+          <div class="user-details">
+            <span id="user-display-name" class="user-name">-</span>
+            <span id="user-display-role" class="user-role-text">-</span>
+          </div>
+          <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          
+          <!-- Dropdown Menu -->
+          <div class="profile-dropdown-menu hidden" id="profile-dropdown">
+            <button id="btn-logout" class="dropdown-item logout">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Çıkış Yap
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-container">
+      <!-- Search and Sort row -->
+      <div class="search-toolbar-row">
+        <div class="search-wrapper">
+          <input type="text" id="doc-search" placeholder="Form adı ile ara...">
+        </div>
+        
+        <div class="toolbar-actions">
+          <div id="hr-actions-top" class="hidden">
+            <button id="btn-open-upload" class="btn-primary" style="padding: 10px 18px; font-size: 13px; border-radius: 8px;">
+              + Yeni Belge Yükle
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtreler -->
+      <div class="table-filters">
+        <button class="filter-btn active" data-category="all">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Tümü
+        </button>
+        <button class="filter-btn" data-category="Proses Kartı">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Proses Kartları
+        </button>
+        <button class="filter-btn" data-category="Prosedür">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          Prosedürler
+        </button>
+        <button class="filter-btn" data-category="Talimat">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          Talimatlar
+        </button>
+        <button class="filter-btn" data-category="Görev Tanımı">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Görev Tanımları
+        </button>
+        <button class="filter-btn" data-category="Form">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          Formlar
+        </button>
+        <button class="filter-btn" data-category="Diğer">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          Diğer
+        </button>
+      </div>
+
+      <!-- Kart Konteyneri -->
+      <div class="process-cards-grid" id="document-cards-container">
+        <!-- JS dinamik dolduracak -->
+      </div>
+
+      <!-- Bilgilendirme Bannerı -->
+      <div class="info-banner">
+        <div class="info-banner-left">
+          <div class="info-banner-icon-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+          <div class="info-banner-text">
+            <strong>Bilgilendirme:</strong> Formlar yalnızca görüntüleme amaçlıdır. Doldurulan formlar ilgili birime teslim edilmelidir.
+          </div>
+        </div>
+        <div class="info-banner-right-graphic">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.1;">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==========================================
+       MODALLAR (MODAL DIALOGS)
+       ========================================== -->
+
+  <!-- 3. Doküman Detay Modalı (Personel ve İK İçin Ortak) -->
+  <div id="modal-doc-details" class="modal-overlay hidden">
+    <div class="modal-content doc-details-modal">
+      <div class="modal-header">
+        <div class="modal-header-title-group" style="display: flex; align-items: center; gap: 12px;">
+          <div class="doc-badge" id="detail-file-badge">PDF</div>
+          <div style="text-align: left;">
+            <h3 id="detail-doc-title" style="margin: 0; font-size: 18px; font-weight: 800; color: #0f172a;">Doküman Detayları</h3>
+            <span id="detail-doc-code" style="font-family: monospace; font-size: 12px; color: #64748b;">PK-TS-01</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" onclick="closeDocDetailsModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body" style="padding: 24px;">
+        <div class="doc-details-layout">
+          <!-- Sol Sütun: Görsel Pane & Aksiyonlar -->
+          <div class="doc-details-visual-pane">
+            <div class="doc-preview-placeholder">
+              <svg viewBox="0 0 24 24" width="48" height="48" stroke="#0d3a5f" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <div class="file-info-subtext" id="detail-file-size" style="font-size: 11px; color: #64748b; margin-top: 10px; font-weight: 600;">Dosya Boyutu: Hesaplanıyor...</div>
+            </div>
+            
+            <div class="details-action-buttons">
+              <button id="btn-detail-download" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 40px; border-radius: 8px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Dokümanı İndir
+              </button>
+              <button id="btn-detail-preview" class="btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 40px; border-radius: 8px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; margin-top: 10px; cursor: pointer;">
+                Tarayıcıda Önizle
+              </button>
+            </div>
+          </div>
+          
+          <!-- Sağ Sütun: Metadatalar -->
+          <div class="doc-details-info-pane">
+            <h4 class="section-subtitle" style="margin: 0 0 14px 0; font-size: 12px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; text-align: left;">Kayıt Bilgileri</h4>
+            <div class="details-meta-table">
+              <div class="meta-table-row">
+                <span class="meta-table-label">Doküman Kodu:</span>
+                <span class="meta-table-value" id="info-doc-code">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">Kategori:</span>
+                <span class="meta-table-value" id="info-doc-category">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">Revizyon No:</span>
+                <span class="meta-table-value" id="info-doc-revision">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">İlk Yayın Tarihi:</span>
+                <span class="meta-table-value" id="info-doc-first-publish">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">Son Güncelleme:</span>
+                <span class="meta-table-value" id="info-doc-last-revision">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">İlgili Departman:</span>
+                <span class="meta-table-value" id="info-doc-dept">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">Erişim Yetkisi:</span>
+                <span class="meta-table-value" id="info-doc-visibility">-</span>
+              </div>
+              <div class="meta-table-row">
+                <span class="meta-table-label">Toplam İndirilme:</span>
+                <span class="meta-table-value" id="info-doc-downloads">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. Belge Yükleme Modalı (İK) -->
+  <div id="modal-upload" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Yeni Belge veya Rapor Yükle</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-upload')">&times;</button>
+      </div>
+      <form id="form-upload" enctype="multipart/form-data">
+        <div class="modal-form-scrollable">
+          <div class="form-group">
+            <label for="upload-title">Belge Başlığı</label>
+            <input type="text" id="upload-title" required placeholder="Örn: 2026 Temmuz Maaş Bordrosu">
+          </div>
+          
+          <div class="form-row" style="display: flex; gap: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-category">Kategori</label>
+              <select id="upload-category" required>
+                <option value="Proses Kartı">Proses Kartı</option>
+                <option value="Prosedür">Prosedür</option>
+                <option value="Talimat">Talimat</option>
+                <option value="Plan">Plan</option>
+                <option value="Görev Tanımı">Görev Tanımı</option>
+                <option value="Form">Form</option>
+                <option value="El Kitabı">El Kitabı</option>
+                <option value="Diğer">Diğer</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-type">Dosya Türü</label>
+              <select id="upload-type" required>
+                <option value="form">Genel Şablon / Form</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-code">Doküman Kodu</label>
+              <input type="text" id="upload-code" placeholder="Örn: PK-TS-01">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-revision">Revizyon No</label>
+              <input type="text" id="upload-revision" placeholder="Örn: 03" value="00">
+            </div>
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-first-publish">İlk Yayın Tarihi</label>
+              <input type="text" id="upload-first-publish" placeholder="Örn: 01.02.2007">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="upload-last-revision">Son Revizyon Tarihi</label>
+              <input type="text" id="upload-last-revision" placeholder="Örn: 10.01.2022">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="upload-related-dept">İlgili Birim / Departman</label>
+            <input type="text" id="upload-related-dept" placeholder="Örn: İnsan Kaynakları Kalite ve Akreditasyon Müdürlüğü">
+          </div>
+
+          <div class="form-group">
+            <label for="upload-visibility">Erişim Yetkisi (Görünürlük)</label>
+            <select id="upload-visibility" required>
+              <option value="all">Tüm Şirket</option>
+              <option value="department">Belirli Bir Departman</option>
+              <option value="user">Kişiye Özel</option>
+            </select>
+          </div>
+
+          <!-- Dinamik hedef seçimi (Departman veya Personel için) -->
+          <div id="target-selection-group" class="form-group hidden">
+            <label id="target-label" for="upload-target">Hedef Seçimi</label>
+            <select id="upload-target">
+              <!-- JS dinamik dolduracak -->
+            </select>
+          </div>
+
+          <!-- Sürükle Bırak Dosya Alanı -->
+          <div class="dropzone" id="upload-dropzone">
+            <div class="dropzone-icon">📥</div>
+            <p>Yüklenecek dosyayı sürükleyin veya tıklayın</p>
+            <span>Maksimum dosya boyutu: 15MB</span>
+            <input type="file" id="upload-file" required style="display: none;">
+          </div>
+
+          <!-- Seçilen Dosya Bilgisi -->
+          <div id="file-info" class="selected-file-info hidden">
+            <span id="file-name-text">dosya-adi.pdf</span>
+            <button type="button" id="btn-remove-file">Kaldır</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Dosyayı Yükle ve Yayınla</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for Document Update -->
+  <input type="file" id="global-update-file-input" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx">
+
+  <!-- Frontend Uygulama Mantığı Bağlantıları -->
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
