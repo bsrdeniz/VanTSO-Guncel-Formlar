@@ -3,7 +3,8 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
-const dbPath = path.join(__dirname, '../database.sqlite');
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '../');
+const dbPath = path.join(dataDir, 'database.sqlite');
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
@@ -114,10 +115,8 @@ function createTablesAndSeed(forceSeed) {
         const salesHash = bcrypt.hashSync('elif123', 10);
 
         const users = [
-          ['HR001', 'Büşra Deniz', 'busra.deniz@sirket.com', hrHash, 'hr', 'Human Resources'],
-          ['EMP001', 'Ahmet Yılmaz', 'ahmet.yilmaz@sirket.com', devHash, 'employee', 'Software Development'],
-          ['EMP002', 'Caner Aydın', 'caner.aydin@sirket.com', mktHash, 'employee', 'Marketing'],
-          ['EMP003', 'Elif Kaya', 'elif.kaya@sirket.com', salesHash, 'employee', 'Sales']
+          ['EMP-00001', 'Büşra Deniz', 'busra.deniz@vantso.org.tr', bcrypt.hashSync('sifre123', 10), 'hr', 'İnsan Kaynakları'],
+          ['EMP-00002', 'Ahmet Yılmaz', 'ahmet.yilmaz@vantso.org.tr', bcrypt.hashSync('sifre123', 10), 'employee', 'Genel Personel']
         ];
 
         const stmt = db.prepare(`
@@ -129,7 +128,7 @@ function createTablesAndSeed(forceSeed) {
           stmt.run(user);
         }
         stmt.finalize(() => {
-          console.log('Mock kullanıcılar başarıyla eklendi.');
+          console.log('Veritabanı sıfırlandı, varsayılan kullanıcılar eklendi.');
           seedDocuments();
         });
       } else {
@@ -146,7 +145,7 @@ function seedDocuments() {
     if (row && row.count === 0) {
       console.log('Proses kartları ve prosedürler tohumlanıyor...');
       
-      const uploadDir = path.join(__dirname, '../secure_uploads');
+      const uploadDir = path.join(dataDir, 'secure_uploads');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }

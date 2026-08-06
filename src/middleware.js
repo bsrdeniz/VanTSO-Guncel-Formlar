@@ -11,6 +11,7 @@ function requireAuth(req, res, next) {
 // Belirli bir role (örn: 'hr') sahip olup olmadığını kontrol eder
 function requireRole(role) {
   return (req, res, next) => {
+    console.log(`[AUTH CHECK] Path: ${req.url}, Required Role: ${role}, Session Role: ${req.session ? req.session.role : 'no session'}`);
     if (req.session && req.session.role === role) {
       return next();
     }

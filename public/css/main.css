@@ -37,6 +37,70 @@
   --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Koyu Tema (Dark Mode) Değişkenleri */
+[data-theme="dark"] {
+  --bg-base: #080c14;           /* Very deep space dark background */
+  --bg-surface: #111a2e;        /* Dark slate card surface */
+  --bg-card: #111a2e;
+  --border-color: #1e293b;      /* Distinguishable border */
+  --border-focus: #38bdf8;      /* Bright cyan focus */
+  
+  --primary: #38bdf8;           /* Bright cyan primary for dark mode */
+  --primary-glow: rgba(56, 189, 248, 0.1);
+  --primary-hover: #7dd3fc;
+  --accent-cyan: #38bdf8;
+  
+  --text-primary: #f8fafc;      /* White/slate main text */
+  --text-secondary: #cbd5e1;    /* Light slate secondary text */
+  --text-muted: #64748b;        /* Muted slate details text */
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+}
+
+/* Dark Mode Specific Separations */
+[data-theme="dark"] .main-header {
+  background: #0e1626 !important;  /* Distinct header shade */
+  border-bottom: 1px solid #1e293b;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .logo-area img {
+  filter: invert(1) hue-rotate(180deg) contrast(1.25) brightness(0.95);
+  mix-blend-mode: screen;
+}
+
+/* Theme Toggle Button Style */
+.theme-toggle-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin-right: 16px;
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+.theme-toggle-btn:hover {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transform: scale(1.05);
+  border-color: var(--primary);
+}
+.theme-toggle-btn svg {
+  transition: transform 0.3s ease;
+}
+.theme-toggle-btn:active svg {
+  transform: rotate(30deg);
+}
+
 /* Sıfırlamalar */
 * {
   box-sizing: border-box;
@@ -113,49 +177,142 @@ body {
   top: 0;
   left: 0;
   z-index: 1000;
-  background: #f1f5f9;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(13, 58, 95, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.06) 0%, transparent 45%);
+  background-image: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.45)), url('../images/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 .login-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
   width: 100%;
   max-width: 440px;
-  padding: 40px;
-  box-shadow: var(--shadow-lg);
+  padding: 48px 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   text-align: center;
-  transition: var(--transition-smooth);
-  animation: fadeIn 0.5s ease-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.login-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(13, 58, 95, 0.15);
+.login-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.login-logo svg {
-  width: 32px;
-  height: 32px;
-  fill: white;
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.login-card h1 {
-  font-size: 24px;
+.login-logo-container img {
+  max-width: 260px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+.login-logo-container img:hover {
+  transform: scale(1.02);
+}
+
+/* segmented tabs control */
+.auth-tabs {
+  display: flex;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 28px;
+  border: 1px solid #cbd5e1;
+  position: relative;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
-  color: var(--text-primary);
+  color: #475569;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.auth-tab:hover {
+  color: #0f172a;
+}
+.auth-tab.active {
+  background: #ffffff;
+  color: #0d3a5f;
+  box-shadow: 0 4px 12px rgba(13, 58, 95, 0.15);
+}
+
+/* Premium Form Group Styling */
+.login-card .form-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+.login-card .form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.login-card .form-group input,
+.login-card .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.login-card .form-group input:focus,
+.login-card .form-group select:focus {
+  background: #ffffff;
+  border-color: #0d3a5f;
+  box-shadow: 0 0 0 4px rgba(13, 58, 95, 0.12);
+  outline: none;
+}
+.login-card button.btn-primary {
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0d3a5f 0%, #1e293b 100%);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(13, 58, 95, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.login-card button.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(13, 58, 95, 0.3);
+  background: linear-gradient(135deg, #174b75 0%, #0f172a 100%);
+}
+.login-card button.btn-primary:active {
+  transform: translateY(0);
 }
 
 .login-card p {
@@ -181,8 +338,8 @@ body {
 .form-group input, .form-group select, .form-group textarea {
   width: 100%;
   padding: 12px 16px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -192,9 +349,19 @@ body {
 }
 
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: var(--primary);
+  border-color: var(--border-focus);
   box-shadow: 0 0 0 4px var(--primary-glow);
-  background: #ffffff;
+  background: var(--bg-base);
+}
+
+.btn-secondary {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-smooth);
+}
+.btn-secondary:hover {
+  background: var(--border-color);
 }
 
 .btn-primary {
@@ -228,16 +395,23 @@ body {
    APP HEADER
    ========================================== */
 .main-header {
-  background: #ffffff;
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  padding: 16px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 16px 0;
   position: sticky;
   top: 0;
   z-index: 900;
+}
+
+.header-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .logo-area {
@@ -373,7 +547,7 @@ body {
 }
 
 .stat-card {
-  background: #ffffff;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 24px 32px;
@@ -443,7 +617,7 @@ body {
 }
 
 .panel-card {
-  background: #ffffff;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 32px;
@@ -523,7 +697,7 @@ body {
 }
 
 .filter-btn.active {
-  background: #ffffff;
+  background: var(--bg-surface);
   color: var(--primary);
   box-shadow: var(--shadow-sm);
   border: none;
@@ -538,8 +712,8 @@ body {
 .search-wrapper input {
   width: 100%;
   padding: 8px 16px 8px 36px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 30px;
   color: var(--text-primary);
   font-size: 13px;
@@ -549,7 +723,7 @@ body {
 
 .search-wrapper input:focus {
   border-color: var(--primary);
-  background: #ffffff;
+  background: var(--bg-surface);
 }
 
 .search-wrapper::before {
@@ -672,7 +846,7 @@ tr:hover td {
 }
 
 .modal-content {
-  background: #ffffff;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   width: 100%;
   max-width: 600px;
@@ -1296,12 +1470,12 @@ tr:hover td {
 .user-details .user-name {
   font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   line-height: 1.2;
 }
 .user-details .user-role-text {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 .dropdown-arrow-icon {
@@ -1313,8 +1487,8 @@ tr:hover td {
   position: absolute;
   top: 115%;
   right: 0;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
   width: 140px;
@@ -1376,13 +1550,13 @@ tr:hover td {
   gap: 12px;
 }
 .btn-sort {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 12px 20px;
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1407,11 +1581,11 @@ tr:hover td {
   width: 100%;
 }
 .table-filters .filter-btn {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 30px;
   padding: 8px 18px;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
   display: flex;
@@ -1447,8 +1621,8 @@ tr:hover td {
 }
 
 .document-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 24px;
   position: relative;
@@ -1491,8 +1665,8 @@ tr:hover td {
 
 /* Doküman Detay Bilgileri Bölümü (Kart Üzerinde Direkt Gösterim) */
 .card-details-section {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 12px 14px;
   margin-top: 14px;
@@ -1517,13 +1691,13 @@ tr:hover td {
 }
 
 .detail-value {
-  color: #334155;
+  color: var(--text-primary);
   font-weight: 700;
   font-size: 11px;
 }
 
 .detail-row.border-top {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
   padding-top: 6px;
   margin-top: 2px;
 }
@@ -1539,7 +1713,7 @@ tr:hover td {
 .document-title {
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   line-height: 1.4;
   margin-bottom: 6px;
   display: -webkit-box;
@@ -1742,16 +1916,16 @@ tr:hover td {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #f8fafc;
+  background: var(--bg-base);
   padding: 18px;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 }
 
 .meta-table-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
   font-size: 12px;
 }
@@ -1770,7 +1944,7 @@ tr:hover td {
 }
 
 .meta-table-value {
-  color: #0f172a;
+  color: var(--text-primary);
   font-weight: 700;
 }
 

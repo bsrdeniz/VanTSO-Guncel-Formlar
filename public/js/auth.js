@@ -136,36 +136,42 @@ async function handleLogout() {
 }
 
 // Giriş Formu Submit Handler
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-  
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    const data = await response.json();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
     
-    if (response.ok) {
-      currentUser = data.user;
-      showToast('Giriş başarılı!', 'success');
-      showAppScreen();
-    } else {
-      showToast(data.error || 'Giriş yapılamadı.', 'error');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        currentUser = data.user;
+        showToast('Giriş başarılı!', 'success');
+        showAppScreen();
+      } else {
+        showToast(data.error || 'Giriş yapılamadı.', 'error');
+      }
+    } catch (error) {
+      console.error('Giriş isteği hatası:', error);
+      showToast('Sunucu ile iletişim kurulamadı.', 'error');
     }
-  } catch (error) {
-    console.error('Giriş isteği hatası:', error);
-    showToast('Sunucu ile iletişim kurulamadı.', 'error');
-  }
-});
+  });
+}
 
 // Çıkış Butonu
-document.getElementById('btn-logout').addEventListener('click', handleLogout);
+const logoutBtn = document.getElementById('btn-logout');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', handleLogout);
+}
 
 // Profil Menüsü Açma/Kapatma (Dropdown)
 document.addEventListener('click', (e) => {
@@ -182,3 +188,63 @@ document.addEventListener('click', (e) => {
 
 // Uygulama yüklendiğinde oturumu kontrol et
 document.addEventListener('DOMContentLoaded', checkSession);
+
+window.switchAuthTab = function(mode) {
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const formLogin = document.getElementById('login-form');
+  const formRegister = document.getElementById('register-form');
+  
+  if (!tabLogin || !tabRegister || !formLogin || !formRegister) return;
+  
+  if (mode === 'login') {
+    tabLogin.classList.add('active');
+    tabRegister.classList.remove('active');
+    formLogin.classList.remove('hidden');
+    formRegister.classList.add('hidden');
+  } else {
+    tabRegister.classList.add('active');
+    tabLogin.classList.remove('active');
+    formRegister.classList.remove('hidden');
+    formLogin.classList.add('hidden');
+  }
+}
+
+// Kayıt Formu Submit Handler
+document.addEventListener('DOMContentLoaded', () => {
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const role = document.getElementById('register-role').value;
+      const password = document.getElementById('register-password').value;
+      
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, role, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showToast(data.message || 'Kayıt başarılı! Şimdi giriş yapabilirsiniz.', 'success');
+          // Giriş formuna geri dön
+          switchAuthTab('login');
+          // E-posta alanını doldur
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-password').value = '';
+        } else {
+          showToast(data.error || 'Kayıt olunamadı.', 'error');
+        }
+      } catch (error) {
+        console.error('Kayıt isteği hatası:', error);
+        showToast('Sunucu ile iletişim kurulamadı.', 'error');
+      }
+    });
+  }
+});

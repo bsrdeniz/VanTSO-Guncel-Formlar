@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/main.css?v=1.1">
 </head>
 <body>
 
@@ -24,16 +24,48 @@
       </div>
       <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: -12px; margin-bottom: 24px;">Van Ticaret ve Sanayi Odası Belge Yönetim Sistemi</p>
       
+      <!-- Tabs for Login / Register -->
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">Giriş Yap</button>
+        <button id="tab-register" class="auth-tab" onclick="switchAuthTab('register')">Kayıt Ol</button>
+      </div>
+
+      <!-- Giriş Formu -->
       <form id="login-form">
         <div class="form-group">
           <label for="login-email">E-posta Adresi</label>
-          <input type="email" id="login-email" required placeholder="örnek@sirket.com" autocomplete="email">
+          <input type="email" id="login-email" required placeholder="ad.soyad@vantso.org.tr" autocomplete="email">
         </div>
         <div class="form-group">
           <label for="login-password">Şifre</label>
           <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
         </div>
         <button type="submit" class="btn-primary">Giriş Yap</button>
+      </form>
+
+      <!-- Kayıt Formu -->
+      <form id="register-form" class="hidden">
+        <div class="form-group">
+          <label for="register-name">Ad Soyad</label>
+          <input type="text" id="register-name" required placeholder="Adınız ve Soyadınız">
+        </div>
+        <div class="form-group">
+          <label for="register-email">Kurumsal E-posta</label>
+          <input type="email" id="register-email" required placeholder="örnek@vantso.org.tr">
+          <span style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">Sadece @vantso.org.tr uzantılı mailler kabul edilir.</span>
+        </div>
+        <div class="form-group">
+          <label for="register-role">Üyelik Tipi</label>
+          <select id="register-role" required style="width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; height: 42px;">
+            <option value="employee" selected>Personel</option>
+            <option value="hr">İnsan Kaynakları</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Şifre</label>
+          <input type="password" id="register-password" required placeholder="En az 6 karakter" minlength="6">
+        </div>
+        <button type="submit" class="btn-primary">Kayıt Ol</button>
       </form>
     </div>
   </div>
@@ -44,35 +76,55 @@
   <div id="app-screen" class="hidden">
     <!-- Üst Başlık (Header) -->
     <header class="main-header">
-      <div class="logo-area" id="header-logo" style="display: flex; align-items: center; gap: 14px;">
-        <img src="images/logo.png" alt="VANTSO Logo" style="height: 56px; width: auto; object-fit: contain;">
-        <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #0d3a5f; letter-spacing: -0.3px; font-family: 'Inter', sans-serif;">VANTSO GÜNCEL FORMLAR</h2>
-      </div>
-      
-      <div class="user-profile-area">
-
+      <div class="header-container">
+        <div class="logo-area" id="header-logo" style="display: flex; align-items: center; gap: 14px;">
+          <img src="images/logo.png" alt="VANTSO Logo" style="height: 56px; width: auto; object-fit: contain;">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: -0.3px; font-family: 'Inter', sans-serif;">VANTSO GÜNCEL FORMLAR</h2>
+        </div>
         
-        <!-- User Profile Capsule -->
-        <div class="user-profile-capsule" id="profile-trigger">
-          <div class="user-avatar-circle" id="user-avatar-initials">BD</div>
-          <div class="user-details">
-            <span id="user-display-name" class="user-name">-</span>
-            <span id="user-display-role" class="user-role-text">-</span>
-          </div>
-          <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+        <div class="user-profile-area">
+          <!-- Theme Toggle Button -->
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Temayı Değiştir">
+            <!-- Sun Icon (Light Mode) -->
+            <svg class="sun-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <!-- Moon Icon (Dark Mode) -->
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
           
-          <!-- Dropdown Menu -->
-          <div class="profile-dropdown-menu hidden" id="profile-dropdown">
-            <button id="btn-logout" class="dropdown-item logout">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              Çıkış Yap
-            </button>
+          <!-- User Profile Capsule -->
+          <div class="user-profile-capsule" id="profile-trigger">
+            <div class="user-avatar-circle" id="user-avatar-initials">BD</div>
+            <div class="user-details">
+              <span id="user-display-name" class="user-name">-</span>
+              <span id="user-display-role" class="user-role-text">-</span>
+            </div>
+            <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            
+            <!-- Dropdown Menu -->
+            <div class="profile-dropdown-menu hidden" id="profile-dropdown">
+              <button id="btn-logout" class="dropdown-item logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Çıkış Yap
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -196,7 +248,7 @@
                 </svg>
                 Dokümanı İndir
               </button>
-              <button id="btn-detail-preview" class="btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 40px; border-radius: 8px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; margin-top: 10px; cursor: pointer;">
+              <button id="btn-detail-preview" class="btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 40px; border-radius: 8px; margin-top: 10px; cursor: pointer;">
                 Tarayıcıda Önizle
               </button>
             </div>
@@ -281,27 +333,7 @@
             </div>
           </div>
 
-          <div class="form-row" style="display: flex; gap: 16px;">
-            <div class="form-group" style="flex: 1;">
-              <label for="upload-code">Doküman Kodu</label>
-              <input type="text" id="upload-code" placeholder="Örn: PK-TS-01">
-            </div>
-            <div class="form-group" style="flex: 1;">
-              <label for="upload-revision">Revizyon No</label>
-              <input type="text" id="upload-revision" placeholder="Örn: 03" value="00">
-            </div>
-          </div>
 
-          <div class="form-row" style="display: flex; gap: 16px;">
-            <div class="form-group" style="flex: 1;">
-              <label for="upload-first-publish">İlk Yayın Tarihi</label>
-              <input type="text" id="upload-first-publish" placeholder="Örn: 01.02.2007">
-            </div>
-            <div class="form-group" style="flex: 1;">
-              <label for="upload-last-revision">Son Revizyon Tarihi</label>
-              <input type="text" id="upload-last-revision" placeholder="Örn: 10.01.2022">
-            </div>
-          </div>
 
           <div class="form-group">
             <label for="upload-related-dept">İlgili Birim / Departman</label>
@@ -312,8 +344,6 @@
             <label for="upload-visibility">Erişim Yetkisi (Görünürlük)</label>
             <select id="upload-visibility" required>
               <option value="all">Tüm Şirket</option>
-              <option value="department">Belirli Bir Departman</option>
-              <option value="user">Kişiye Özel</option>
             </select>
           </div>
 
@@ -349,7 +379,7 @@
   <input type="file" id="global-update-file-input" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx">
 
   <!-- Frontend Uygulama Mantığı Bağlantıları -->
-  <script src="js/auth.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/auth.js?v=1.1"></script>
+  <script src="js/dashboard.js?v=1.1"></script>
 </body>
 </html>

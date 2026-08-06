@@ -12,6 +12,12 @@ function openModal(modalId) {
   // Eğer çalışan ekleme veya dosya yükleme modalı ise listeleri yükle
   if (modalId === 'modal-upload') {
     loadUploadTargets();
+    
+    // Otomatik olarak İlgili Birim / Departman alanını kullanıcının kendi departmanı ile doldur
+    const relatedDeptInput = document.getElementById('upload-related-dept');
+    if (relatedDeptInput && currentUser && currentUser.department) {
+      relatedDeptInput.value = currentUser.department;
+    }
   } else if (modalId === 'modal-submit-form') {
     loadFormReferences();
   }
@@ -669,10 +675,6 @@ function setupDashboardEventListeners() {
     formData.append('visibility', document.getElementById('upload-visibility').value);
     
     // Yeni metadata alanları
-    formData.append('document_code', document.getElementById('upload-code').value);
-    formData.append('revision_no', document.getElementById('upload-revision').value);
-    formData.append('first_publish_date', document.getElementById('upload-first-publish').value);
-    formData.append('last_revision_date', document.getElementById('upload-last-revision').value);
     formData.append('related_department', document.getElementById('upload-related-dept').value);
     
     const targetVal = document.getElementById('upload-target').value;
@@ -917,3 +919,38 @@ async function deleteDocument(docId) {
     showToast('Sunucu ile iletişim kurulamadı.', 'error');
   }
 }
+
+// ==========================================
+// TEMA SEÇİCİ (THEME TOGGLE) MANTIĞI
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  if (!themeToggleBtn) return;
+
+  const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+  const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+
+  // Sayfa yüklendiğinde localStorage veya sistem tercihine göre temayı seç
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeIcons(currentTheme);
+
+  themeToggleBtn.addEventListener('click', () => {
+    const activeTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcons(newTheme);
+  });
+
+  function updateThemeIcons(theme) {
+    if (theme === 'dark') {
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.add('hidden');
+    } else {
+      sunIcon.classList.add('hidden');
+      moonIcon.classList.remove('hidden');
+    }
+  }
+});

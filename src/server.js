@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const pdfParse = require('pdf-parse');
 const db = require('./database');
 const { requireAuth, requireRole } = require('./middleware');
 
@@ -11,8 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Gerekli klasörleri oluştur (Özellikle hassas klasörler public dışında)
-const uploadDir = path.join(__dirname, '../secure_uploads');
-const submissionDir = path.join(__dirname, '../secure_uploads/submissions');
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '../');
+const uploadDir = path.join(dataDir, 'secure_uploads');
+const submissionDir = path.join(dataDir, 'secure_uploads/submissions');
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -22,6 +24,10 @@ if (!fs.existsSync(submissionDir)) {
 }
 
 // Middleware setup
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url}`);
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -37,8 +43,17 @@ app.use(session({
   }
 }));
 
-// Statik Dosyaları Sunma (Sadece public klasörü dışarı açık)
-app.use(express.static(path.join(__dirname, '../public')));
+// Statik Dosyaları Sunma (Geliştirme esnasında tarayıcı önbelleklemesini tamamen devre dışı bırakıyoruz)
+app.use(express.static(path.join(__dirname, '../public'), {
+  etag: false,
+  maxAge: 0,
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+  }
+}));
 
 // === MULTER CONFIGURATION (Dosya Yükleme Ayarları) ===
 
@@ -125,6 +140,68 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
+// Kayıt Ol (Register)
+app.post('/api/auth/register', (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ error: 'Lütfen tüm alanları doldurun.' });
+  }
+
+  // E-posta formatı ve kurumsal alan adı kontrolü
+  const trimmedEmail = email.trim().toLowerCase();
+  if (!trimmedEmail.endsWith('@vantso.org.tr')) {
+    return res.status(400).json({ error: 'Sadece kurumsal e-posta adresleri (@vantso.org.tr) ile kayıt olabilirsiniz.' });
+  }
+
+  // Şifre uzunluğu kontrolü
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Şifreniz en az 6 karakter olmalıdır.' });
+  }
+
+  // E-postanın kullanımda olup olmadığını kontrol et
+  db.get('SELECT id FROM users WHERE email = ?', [trimmedEmail], (err, user) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Sunucu hatası oluştu.' });
+    }
+    if (user) {
+      return res.status(400).json({ error: 'Bu e-posta adresi zaten kullanımda.' });
+    }
+
+    // Benzersiz bir employee_id üretelim (Örn: EMP-12345)
+    const empId = 'EMP-' + Math.floor(10000 + Math.random() * 90000);
+    const passwordHash = bcrypt.hashSync(password, 10);
+    
+    // Rol ve Departman belirleme
+    let finalRole = role; // Seçilen rol ('hr' veya 'employee')
+    let finalDept = 'Genel Personel';
+    
+    if (finalRole === 'hr') {
+      finalDept = 'İnsan Kaynakları';
+    }
+
+    db.run(`
+      INSERT INTO users (employee_id, name, email, password_hash, role, department)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [
+      empId,
+      name,
+      trimmedEmail,
+      passwordHash,
+      finalRole,
+      finalDept
+    ], function(insertErr) {
+      if (insertErr) {
+        console.error(insertErr);
+        return res.status(500).json({ error: 'Kayıt işlemi başarısız oldu.' });
+      }
+      res.status(201).json({ message: 'Kayıt başarıyla tamamlandı. Giriş yapabilirsiniz.' });
+    });
+  });
+});
+
+
 // Oturum Durumunu Al
 app.get('/api/auth/me', (req, res) => {
   if (req.session && req.session.userId) {
@@ -196,9 +273,77 @@ app.post('/api/employees', requireAuth, requireRole('hr'), (req, res) => {
 // 3. DOCUMENT ENDPOINTS (Belge Yönetimi)
 // ==========================================
 
+// Helper to extract metadata from PDF text using RegEx
+function extractMetadataFromText(text) {
+  // Turkish lowercase normalization (Crucial for case-insensitive matching on İ/ı/I/i)
+  const normalizedText = text
+    .replace(/İ/g, 'i')
+    .replace(/I/g, 'ı')
+    .replace(/Ğ/g, 'ğ')
+    .replace(/Ü/g, 'ü')
+    .replace(/Ş/g, 'ş')
+    .replace(/Ö/g, 'ö')
+    .replace(/Ç/g, 'ç')
+    .toLowerCase();
+
+  let docCode = null;
+  let revisionNo = '00';
+  let firstPublishDate = null;
+  let lastRevisionDate = null;
+
+  // 1. Doküman Kodu (Örn: DÖKÜMAN KOD NO: FRM-İK-04)
+  const codeMatches = normalizedText.match(/(?:doküman\s*kod\s*no|doküman\s*kodu|doküman\s*no|dokumanyayin|kodu|no)\s*[:\-\s\t]+([a-z0-9\-ıiğüşöç\s\t]+)/i);
+  if (codeMatches) {
+    const rawCode = codeMatches[1].split('\n')[0].trim().replace(/[\s\t\r]+/g, '').toUpperCase();
+    if (rawCode.length >= 3) {
+      docCode = rawCode;
+    }
+  }
+
+  // 2. Revizyon No (Örn: Revizyon No: 01)
+  const revMatches = normalizedText.match(/(?:revizyon\s*no|revizyon\s*numarası|rev\.?\s*no|rev)\s*[:\-\s\t]*([0-9]{1,2})/i);
+  if (revMatches) {
+    revisionNo = revMatches[1].trim().padStart(2, '0');
+  }
+
+  // 3. Tarihler (GG.AA.YYYY formatı)
+  const dateRegex = /\b(0[1-9]|[12][0-9]|3[01])[\.\/](0[1-9]|1[0-2])[\.\/](19\d\d|20\d\d)\b/g;
+  const dates = normalizedText.match(dateRegex);
+  
+  if (dates && dates.length > 0) {
+    // Tarihleri kronolojik sırala: En eski olan ilk yayın, en yeni olan son revizyon
+    const sortedDates = [...dates].sort((a, b) => {
+      const partsA = a.split(/[\.\/]/);
+      const partsB = b.split(/[\.\/]/);
+      const dateA = new Date(partsA[2], partsA[1] - 1, partsA[0]);
+      const dateB = new Date(partsB[2], partsB[1] - 1, partsB[0]);
+      return dateA - dateB;
+    });
+
+    firstPublishDate = sortedDates[0];
+    lastRevisionDate = sortedDates[sortedDates.length - 1];
+  }
+
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  const todayStr = `${dd}.${mm}.${yyyy}`;
+
+  if (!firstPublishDate) firstPublishDate = todayStr;
+  if (!lastRevisionDate) lastRevisionDate = firstPublishDate;
+
+  return {
+    docCode,
+    revisionNo,
+    firstPublishDate,
+    lastRevisionDate
+  };
+}
+
 // Belge Yükle (Sadece İK)
-app.post('/api/documents/upload', requireAuth, requireRole('hr'), uploadHr.single('file'), (req, res) => {
-  const { title, category, type, visibility, target_id, document_code, first_publish_date, revision_no, last_revision_date, related_department } = req.body;
+app.post('/api/documents/upload', requireAuth, requireRole('hr'), uploadHr.single('file'), async (req, res) => {
+  const { title, category, type, visibility, target_id, related_department } = req.body;
   const file = req.file;
 
   if (!file) {
@@ -218,6 +363,42 @@ app.post('/api/documents/upload', requireAuth, requireRole('hr'), uploadHr.singl
     finalTargetId = target_id; // Seçilen user.id
   }
 
+  let finalDocCode = null;
+  let finalFirstPublish = null;
+  let finalRevision = '00';
+  let finalLastRevision = null;
+
+  // PDF ise verileri dosyadan çek
+  if (file.mimetype === 'application/pdf') {
+    try {
+      const dataBuffer = fs.readFileSync(file.path);
+      const parser = new pdfParse.PDFParse(new Uint8Array(dataBuffer));
+      const pdfData = await parser.getText();
+      const meta = extractMetadataFromText(pdfData.text);
+      
+      finalDocCode = meta.docCode;
+      finalRevision = meta.revisionNo;
+      finalFirstPublish = meta.firstPublishDate;
+      finalLastRevision = meta.lastRevisionDate;
+    } catch (parseErr) {
+      console.error('PDF metin çıkarma hatası:', parseErr);
+    }
+  }
+
+  // Eğer veri bulunamadıysa veya dosya PDF değilse varsayılan değerleri ata
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  const todayStr = `${dd}.${mm}.${yyyy}`;
+
+  if (!finalDocCode) {
+    const initials = category.split(' ').map(w => w[0]).join('').toUpperCase();
+    finalDocCode = `${initials}-${Math.floor(100 + Math.random() * 900)}`;
+  }
+  if (!finalFirstPublish) finalFirstPublish = todayStr;
+  if (!finalLastRevision) finalLastRevision = finalFirstPublish;
+
   db.run(`
     INSERT INTO documents (title, original_filename, filename, category, type, visibility, target_id, uploaded_by, document_code, first_publish_date, revision_no, last_revision_date, related_department)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -230,10 +411,10 @@ app.post('/api/documents/upload', requireAuth, requireRole('hr'), uploadHr.singl
     visibility,
     finalTargetId,
     req.session.userId,
-    document_code || null,
-    first_publish_date || null,
-    revision_no || null,
-    last_revision_date || null,
+    finalDocCode,
+    finalFirstPublish,
+    finalRevision,
+    finalLastRevision,
     related_department || null
   ], function(err) {
     if (err) {
