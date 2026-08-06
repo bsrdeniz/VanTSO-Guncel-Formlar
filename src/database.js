@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
 const dataDir = process.env.DATA_DIR || path.join(__dirname, '../');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 const dbPath = path.join(dataDir, 'database.sqlite');
 
 const db = new sqlite3.Database(dbPath, (err) => {
