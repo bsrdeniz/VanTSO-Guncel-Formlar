@@ -82,12 +82,60 @@ async function loadDocuments() {
     if (response.ok) {
       const data = await response.json();
       allDocuments = data.documents;
+      updateCategoryCounts();
       renderDocuments();
     }
   } catch (error) {
     console.error('Belgeler yüklenemedi:', error);
     showToast('Belgeler yüklenirken hata oluştu.', 'error');
   }
+}
+
+function updateCategoryCounts() {
+  const counts = {
+    all: allDocuments.length,
+    'Proses Kartı': 0,
+    'Prosedür': 0,
+    'Talimat': 0,
+    'Görev Tanımı': 0,
+    'Form': 0,
+    'Plan': 0,
+    'Diğer': 0
+  };
+
+  const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
+
+  allDocuments.forEach(doc => {
+    if (counts[doc.category] !== undefined) {
+      counts[doc.category]++;
+    } else {
+      counts['Diğer']++;
+    }
+  });
+
+  const countAll = document.getElementById('count-all');
+  if (countAll) countAll.textContent = `${counts['all']} Belge`;
+
+  const countProses = document.getElementById('count-proses');
+  if (countProses) countProses.textContent = `${counts['Proses Kartı']} Belge`;
+
+  const countProsedur = document.getElementById('count-prosedur');
+  if (countProsedur) countProsedur.textContent = `${counts['Prosedür']} Belge`;
+
+  const countTalimat = document.getElementById('count-talimat');
+  if (countTalimat) countTalimat.textContent = `${counts['Talimat']} Belge`;
+
+  const countGorev = document.getElementById('count-gorev');
+  if (countGorev) countGorev.textContent = `${counts['Görev Tanımı']} Belge`;
+
+  const countForm = document.getElementById('count-form');
+  if (countForm) countForm.textContent = `${counts['Form']} Belge`;
+
+  const countPlan = document.getElementById('count-plan');
+  if (countPlan) countPlan.textContent = `${counts['Plan']} Belge`;
+
+  const countDiger = document.getElementById('count-diger');
+  if (countDiger) countDiger.textContent = `${counts['Diğer']} Belge`;
 }
 
 // Türkçe karakter uyumlu küçük harf çevirici (Arama doğruluğu için)
@@ -116,7 +164,7 @@ function renderDocuments() {
     // Kategori filtresi
     if (selectedCategory !== 'all') {
       if (selectedCategory === 'Diğer') {
-        const otherCategories = ['Diğer', 'El Kitabı', 'Plan', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
+        const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
         if (!otherCategories.includes(doc.category)) {
           return false;
         }
@@ -622,12 +670,12 @@ async function processSubmission(subId, status) {
 // ==========================================
 function setupDashboardEventListeners() {
   
-  // Hızlı Arama Butonları (Kategori Filtreleme)
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedCategory = btn.getAttribute('data-category');
+  // Kategori Kartları (Kategori Filtreleme)
+  document.querySelectorAll('.filter-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedCategory = card.getAttribute('data-category');
       renderDocuments();
     });
   });

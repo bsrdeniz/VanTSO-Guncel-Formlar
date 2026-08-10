@@ -146,36 +146,95 @@
         </div>
       </div>
 
-      <!-- Filtreler -->
-      <div class="table-filters">
-        <button class="filter-btn active" data-category="all">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Tümü
-        </button>
-        <button class="filter-btn" data-category="Proses Kartı">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          Proses Kartları
-        </button>
-        <button class="filter-btn" data-category="Prosedür">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-          Prosedürler
-        </button>
-        <button class="filter-btn" data-category="Talimat">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-          Talimatlar
-        </button>
-        <button class="filter-btn" data-category="Görev Tanımı">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Görev Tanımları
-        </button>
-        <button class="filter-btn" data-category="Form">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          Formlar
-        </button>
-        <button class="filter-btn" data-category="Diğer">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-          Diğer
-        </button>
+      <!-- Filtre Kartları -->
+      <div class="filter-cards-container">
+        <div class="filter-card active" data-category="all">
+          <div class="filter-card-icon-box all">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Tüm Belgeler</h3>
+            <p class="filter-card-desc">Sistemdeki tüm güncel belgeler</p>
+            <span class="filter-card-count" id="count-all">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Proses Kartı">
+          <div class="filter-card-icon-box proses">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Proses Kartları</h3>
+            <p class="filter-card-desc">Süreç ve operasyon akış şemaları</p>
+            <span class="filter-card-count" id="count-proses">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Prosedür">
+          <div class="filter-card-icon-box prosedur">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Prosedürler</h3>
+            <p class="filter-card-desc">Uygulama yöntemleri ve kuralları</p>
+            <span class="filter-card-count" id="count-prosedur">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Talimat">
+          <div class="filter-card-icon-box talimat">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Talimatlar</h3>
+            <p class="filter-card-desc">Adım adım iş yapış kılavuzları</p>
+            <span class="filter-card-count" id="count-talimat">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Görev Tanımı">
+          <div class="filter-card-icon-box gorev">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Görev Tanımları</h3>
+            <p class="filter-card-desc">Kadro yetki ve sorumluluk detayları</p>
+            <span class="filter-card-count" id="count-gorev">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Form">
+          <div class="filter-card-icon-box form">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Formlar</h3>
+            <p class="filter-card-desc">Kullanıma hazır boş matbu formlar</p>
+            <span class="filter-card-count" id="count-form">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Plan">
+          <div class="filter-card-icon-box plan">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Planlar</h3>
+            <p class="filter-card-desc">Kurumsal faaliyet ve eylem planları</p>
+            <span class="filter-card-count" id="count-plan">0 Belge</span>
+          </div>
+        </div>
+
+        <div class="filter-card" data-category="Diğer">
+          <div class="filter-card-icon-box diger">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          </div>
+          <div class="filter-card-content">
+            <h3 class="filter-card-title">Diğer Belgeler</h3>
+            <p class="filter-card-desc">El kitapları, bordrolar, sözleşmeler</p>
+            <span class="filter-card-count" id="count-diger">0 Belge</span>
+          </div>
+        </div>
       </div>
 
       <!-- Kart Konteyneri -->

@@ -1961,3 +1961,161 @@ tr:hover td {
     padding-bottom: 20px;
   }
 }
+
+/* ==========================================
+   KATEGORI FILTRE KARTLARI (FILTER CARDS)
+   ========================================== */
+.filter-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.filter-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.filter-card-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.filter-card-icon-box.all { background: rgba(13, 58, 95, 0.08); color: #0d3a5f; }
+.filter-card-icon-box.proses { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+.filter-card-icon-box.prosedur { background: rgba(59, 130, 246, 0.08); color: #3b82f6; }
+.filter-card-icon-box.talimat { background: rgba(16, 185, 129, 0.08); color: #10b981; }
+.filter-card-icon-box.gorev { background: rgba(99, 102, 241, 0.08); color: #6366f1; }
+.filter-card-icon-box.form { background: rgba(236, 72, 153, 0.08); color: #ec4899; }
+.filter-card-icon-box.plan { background: rgba(14, 165, 233, 0.08); color: #0ea5e9; }
+.filter-card-icon-box.diger { background: rgba(100, 116, 139, 0.08); color: #64748b; }
+
+.filter-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.filter-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-card-desc {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-card-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary, #0d3a5f);
+  margin-top: 4px;
+  background: rgba(13, 58, 95, 0.05);
+  padding: 2px 8px;
+  border-radius: 12px;
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+.filter-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.filter-card:hover .filter-card-icon-box {
+  transform: scale(1.08);
+}
+
+.filter-card.active {
+  border-color: #0d3a5f;
+  box-shadow: 0 8px 16px rgba(13, 58, 95, 0.08);
+}
+
+.filter-card.active::before {
+  background: #0d3a5f;
+}
+
+.filter-card.active .filter-card-icon-box.all { background: #0d3a5f; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.proses { background: #f59e0b; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.prosedur { background: #3b82f6; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.talimat { background: #10b981; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.gorev { background: #6366f1; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.form { background: #ec4899; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.plan { background: #0ea5e9; color: #ffffff; }
+.filter-card.active .filter-card-icon-box.diger { background: #64748b; color: #ffffff; }
+
+.filter-card.active .filter-card-count {
+  background: #0d3a5f;
+  color: #ffffff;
+}
+
+.dark-mode .filter-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dark-mode .filter-card-title {
+  color: #f1f5f9;
+}
+.dark-mode .filter-card:hover {
+  border-color: #475569;
+}
+.dark-mode .filter-card.active {
+  border-color: #38bdf8;
+}
+.dark-mode .filter-card.active::before {
+  background: #38bdf8;
+}
+.dark-mode .filter-card.active .filter-card-count {
+  background: #38bdf8;
+  color: #0f172a;
+}
+.dark-mode .filter-card.active .filter-card-icon-box.all { background: #38bdf8; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.proses { background: #fbbf24; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.prosedur { background: #60a5fa; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.talimat { background: #34d399; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.gorev { background: #818cf8; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.form { background: #f472b6; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.plan { background: #38bdf8; color: #0f172a; }
+.dark-mode .filter-card.active .filter-card-icon-box.diger { background: #94a3b8; color: #0f172a; }
