@@ -976,6 +976,7 @@ function setupDashboardEventListeners() {
         showToast('Form gönderilirken hata oluştu.', 'error');
       }
     });
+  }
   // 4. İK Yeni Kategori Oluşturma Formu
   const formAddCategory = document.getElementById('form-add-category');
   if (formAddCategory) {
