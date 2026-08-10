@@ -133,16 +133,32 @@
     <main class="app-container">
       <!-- GÖRÜNÜM 1: KATEGORİ SEÇİM SAYFASI -->
       <div id="view-categories-page" class="view-page">
-        <div class="view-header-row" style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-          <div class="active-category-title-group">
-            <h2 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0;">Belge Kategorileri</h2>
-            <span style="font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px;">Görüntülemek istediğiniz belge grubunu seçin.</span>
+        <!-- Premium Hoş Geldiniz Bannerı -->
+        <div class="welcome-hero-card">
+          <div class="welcome-hero-content">
+            <span class="welcome-hero-badge">VAN TSO DOKÜMAN MERKEZİ</span>
+            <h1 class="welcome-hero-title">Belge & Yönetim Portalı</h1>
+            <p class="welcome-hero-subtitle">İhtiyacınız olan tüm kurumsal belgelere, formlara ve süreç akışlarına kategorize edilmiş bölümlerden hızlıca ulaşabilirsiniz.</p>
           </div>
+          <div class="welcome-hero-illustration">
+            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="section-title-wrapper" style="margin-bottom: 24px;">
+          <h2 class="section-title" style="font-size: 20px; font-weight: 800; color: var(--primary); margin: 0;">Doküman Kategorileri</h2>
+          <p class="section-subtitle" style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0;">Görüntülemek istediğiniz belge grubunu seçin</p>
         </div>
 
         <!-- Filtre Kartları Izgarası -->
         <div class="filter-cards-container">
-          <div class="filter-card active" data-category="all">
+          <div class="filter-card active" data-category="all" style="--card-index: 1;">
             <div class="filter-card-icon-box all">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </div>
@@ -153,7 +169,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Proses Kartı">
+          <div class="filter-card" data-category="Proses Kartı" style="--card-index: 2;">
             <div class="filter-card-icon-box proses">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             </div>
@@ -164,7 +180,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Prosedür">
+          <div class="filter-card" data-category="Prosedür" style="--card-index: 3;">
             <div class="filter-card-icon-box prosedur">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
             </div>
@@ -175,7 +191,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Talimat">
+          <div class="filter-card" data-category="Talimat" style="--card-index: 4;">
             <div class="filter-card-icon-box talimat">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             </div>
@@ -186,7 +202,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Görev Tanımı">
+          <div class="filter-card" data-category="Görev Tanımı" style="--card-index: 5;">
             <div class="filter-card-icon-box gorev">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
@@ -197,7 +213,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Form">
+          <div class="filter-card" data-category="Form" style="--card-index: 6;">
             <div class="filter-card-icon-box form">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             </div>
@@ -208,7 +224,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Plan">
+          <div class="filter-card" data-category="Plan" style="--card-index: 7;">
             <div class="filter-card-icon-box plan">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>
@@ -219,7 +235,7 @@
             </div>
           </div>
 
-          <div class="filter-card" data-category="Diğer">
+          <div class="filter-card" data-category="Diğer" style="--card-index: 8;">
             <div class="filter-card-icon-box diger">
               <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
             </div>
