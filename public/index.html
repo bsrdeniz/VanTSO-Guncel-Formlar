@@ -143,95 +143,9 @@
           <p class="section-subtitle" style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0;">Görüntülemek istediğiniz belge grubunu seçin</p>
         </div>
 
-        <!-- Filtre Kartları Izgarası -->
-        <div class="filter-cards-container">
-          <div class="filter-card active" data-category="all" style="--card-index: 1;">
-            <div class="filter-card-icon-box all">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Tüm Belgeler</h3>
-              <p class="filter-card-desc">Sistemdeki tüm güncel belgeler</p>
-              <span class="filter-card-count" id="count-all">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Proses Kartı" style="--card-index: 2;">
-            <div class="filter-card-icon-box proses">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Proses Kartları</h3>
-              <p class="filter-card-desc">Süreç ve operasyon akış şemaları</p>
-              <span class="filter-card-count" id="count-proses">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Prosedür" style="--card-index: 3;">
-            <div class="filter-card-icon-box prosedur">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Prosedürler</h3>
-              <p class="filter-card-desc">Uygulama yöntemleri ve kuralları</p>
-              <span class="filter-card-count" id="count-prosedur">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Talimat" style="--card-index: 4;">
-            <div class="filter-card-icon-box talimat">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Talimatlar</h3>
-              <p class="filter-card-desc">Adım adım iş yapış kılavuzları</p>
-              <span class="filter-card-count" id="count-talimat">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Görev Tanımı" style="--card-index: 5;">
-            <div class="filter-card-icon-box gorev">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Görev Tanımları</h3>
-              <p class="filter-card-desc">Kadro yetki ve sorumluluk detayları</p>
-              <span class="filter-card-count" id="count-gorev">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Form" style="--card-index: 6;">
-            <div class="filter-card-icon-box form">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Formlar</h3>
-              <p class="filter-card-desc">Kullanıma hazır boş matbu formlar</p>
-              <span class="filter-card-count" id="count-form">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Plan" style="--card-index: 7;">
-            <div class="filter-card-icon-box plan">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Planlar</h3>
-              <p class="filter-card-desc">Kurumsal faaliyet ve eylem planları</p>
-              <span class="filter-card-count" id="count-plan">0 Belge</span>
-            </div>
-          </div>
-
-          <div class="filter-card" data-category="Diğer" style="--card-index: 8;">
-            <div class="filter-card-icon-box diger">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-            </div>
-            <div class="filter-card-content">
-              <h3 class="filter-card-title">Diğer Belgeler</h3>
-              <p class="filter-card-desc">El kitapları, bordrolar, sözleşmeler</p>
-              <span class="filter-card-count" id="count-diger">0 Belge</span>
-            </div>
-          </div>
+        <!-- Filtre Kartları Izgarası (Dinamik Yüklenir) -->
+        <div class="filter-cards-container" id="categories-container">
+          <!-- JS dinamik olarak dolduracak -->
         </div>
       </div>
 
@@ -457,6 +371,63 @@
         </div>
 
         <button type="submit" class="btn-primary">Dosyayı Yükle ve Yayınla</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Yeni Kategori Ekleme Modalı (Sadece İK Yetkilileri Görebilir) -->
+  <div id="modal-add-category" class="modal-overlay hidden">
+    <div class="modal-content text-left" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>Yeni Kategori Oluştur</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-add-category')">&times;</button>
+      </div>
+      <form id="form-add-category">
+        <div class="modal-body" style="padding: 24px;">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="cat-name">Kategori Adı</label>
+            <input type="text" id="cat-name" required placeholder="Örn: Yönetmelik, Tüzük, Protokol">
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="cat-description">Kategori Açıklaması</label>
+            <input type="text" id="cat-description" required placeholder="Örn: Kurumsal tüzük ve yönetmelik belgeleri">
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="cat-icon">Kart İkonu</label>
+              <select id="cat-icon" required style="width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; height: 42px;">
+                <option value="all">Kutu İkonu</option>
+                <option value="proses" selected>Proses Akış İkonu</option>
+                <option value="prosedur">Klasör İkonu</option>
+                <option value="talimat">Onay/Tik İkonu</option>
+                <option value="gorev">Çalışan İkonu</option>
+                <option value="form">Belge İkonu</option>
+                <option value="plan">Takvim/Plan İkonu</option>
+                <option value="diger">Üç Nokta İkonu</option>
+              </select>
+            </div>
+            
+            <div class="form-group" style="flex: 1;">
+              <label for="cat-color">Tema Rengi</label>
+              <select id="cat-color" required style="width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; height: 42px;">
+                <option value="#f59e0b" selected>Turuncu</option>
+                <option value="#3b82f6">Mavi</option>
+                <option value="#10b981">Yeşil</option>
+                <option value="#6366f1">Çivit Mavisi (Indigo)</option>
+                <option value="#ec4899">Pembe</option>
+                <option value="#0ea5e9">Gök Mavisi (Cyan)</option>
+                <option value="#7c3aed">Mor</option>
+                <option value="#64748b">Slate Grisi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color);">
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-add-category')">İptal</button>
+          <button type="submit" class="btn-primary">Kategori Oluştur</button>
+        </div>
       </form>
     </div>
   </div>

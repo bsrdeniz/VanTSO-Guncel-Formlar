@@ -2207,35 +2207,22 @@ tr:hover td {
 
 /* Active Indicator States */
 .filter-card.active::before {
-  background: var(--primary);
+  background: var(--accent-color, var(--primary)) !important;
 }
 
-.filter-card.active[data-category="all"]::before { background: #0d3a5f; }
-.filter-card.active[data-category="Proses Kartı"]::before { background: #f59e0b; }
-.filter-card.active[data-category="Prosedür"]::before { background: #3b82f6; }
-.filter-card.active[data-category="Talimat"]::before { background: #10b981; }
-.filter-card.active[data-category="Görev Tanımı"]::before { background: #6366f1; }
-.filter-card.active[data-category="Form"]::before { background: #ec4899; }
-.filter-card.active[data-category="Plan"]::before { background: #0ea5e9; }
-.filter-card.active[data-category="Diğer"]::before { background: #64748b; }
-
 .filter-card.active {
-  border-color: var(--primary);
+  border-color: var(--accent-color, var(--primary)) !important;
   box-shadow: 0 8px 24px rgba(13, 58, 95, 0.08);
 }
 
-.filter-card.active .filter-card-icon-box.all { background: #0d3a5f; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.proses { background: #f59e0b; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.prosedur { background: #3b82f6; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.talimat { background: #10b981; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.gorev { background: #6366f1; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.form { background: #ec4899; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.plan { background: #0ea5e9; color: #ffffff; }
-.filter-card.active .filter-card-icon-box.diger { background: #64748b; color: #ffffff; }
+.filter-card.active .filter-card-icon-box {
+  background: var(--accent-color, var(--primary)) !important;
+  color: #ffffff !important;
+}
 
 .filter-card.active .filter-card-count {
-  background: var(--primary);
-  color: #ffffff;
+  background: var(--accent-color, var(--primary)) !important;
+  color: #ffffff !important;
 }
 
 /* Dark Mode support */

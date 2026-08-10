@@ -25,7 +25,45 @@ db.serialize(() => {
       console.log("Eski veritabanı tablosu tespit edildi, sıfırlanıyor...");
       resetDatabaseSchema();
     } else {
-      createTablesAndSeed(false);
+      // CHECK kısıtlaması kontrolü ve migrasyonu
+      db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='documents'", (masterErr, row) => {
+        if (row && row.sql.includes('CHECK(category IN')) {
+          console.log("Documents tablosundaki CHECK kısıtlaması kaldırılıyor...");
+          db.serialize(() => {
+            db.run("PRAGMA foreign_keys=OFF");
+            db.run("BEGIN TRANSACTION");
+            db.run("ALTER TABLE documents RENAME TO documents_old");
+            db.run(`
+              CREATE TABLE documents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                original_filename TEXT NOT NULL,
+                filename TEXT UNIQUE NOT NULL,
+                category TEXT NOT NULL,
+                type TEXT CHECK(type IN ('form', 'report')) NOT NULL,
+                visibility TEXT CHECK(visibility IN ('all', 'department', 'user')) NOT NULL,
+                target_id TEXT,
+                uploaded_by INTEGER NOT NULL,
+                uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                document_code TEXT,
+                first_publish_date TEXT,
+                revision_no TEXT,
+                last_revision_date TEXT,
+                related_department TEXT,
+                FOREIGN KEY (uploaded_by) REFERENCES users(id)
+              )
+            `);
+            db.run("INSERT INTO documents SELECT * FROM documents_old");
+            db.run("DROP TABLE documents_old");
+            db.run("COMMIT");
+            db.run("PRAGMA foreign_keys=ON");
+            console.log("MIGRATION: CHECK kısıtlaması kaldırıldı.");
+            createTablesAndSeed(false);
+          });
+        } else {
+          createTablesAndSeed(false);
+        }
+      });
     }
   });
 });
@@ -62,7 +100,7 @@ function createTablesAndSeed(forceSeed) {
         title TEXT NOT NULL,
         original_filename TEXT NOT NULL,
         filename TEXT UNIQUE NOT NULL,
-        category TEXT CHECK(category IN ('Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form', 'El Kitabı', 'Proses Kartı', 'Prosedür', 'Talimat', 'Plan', 'Görev Tanımı', 'Form', 'Diğer')) NOT NULL,
+        category TEXT NOT NULL,
         type TEXT CHECK(type IN ('form', 'report')) NOT NULL,
         visibility TEXT CHECK(visibility IN ('all', 'department', 'user')) NOT NULL,
         target_id TEXT,
@@ -106,6 +144,33 @@ function createTablesAndSeed(forceSeed) {
         FOREIGN KEY (document_id) REFERENCES documents(id)
       )
     `);
+
+    // 5. Categories Tablosu
+    db.run(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        description TEXT,
+        icon TEXT DEFAULT 'diger',
+        color TEXT DEFAULT '#64748b'
+      )
+    `, (createErr) => {
+      if (!createErr) {
+        db.get("SELECT COUNT(*) as count FROM categories", (countErr, row) => {
+          if (!countErr && row.count === 0) {
+            const stmt = db.prepare("INSERT INTO categories (name, description, icon, color) VALUES (?, ?, ?, ?)");
+            stmt.run("Proses Kartı", "Süreç ve operasyon akış şemaları", "proses", "#f59e0b");
+            stmt.run("Prosedür", "Uygulama yöntemleri ve kuralları", "prosedur", "#3b82f6");
+            stmt.run("Talimat", "Adım adım iş yapış kılavuzları", "talimat", "#10b981");
+            stmt.run("Görev Tanımı", "Kadro yetki ve sorumluluk detayları", "gorev", "#6366f1");
+            stmt.run("Form", "Kullanıma hazır boş matbu formlar", "form", "#ec4899");
+            stmt.run("Plan", "Kurumsal faaliyet ve eylem planları", "plan", "#0ea5e9");
+            stmt.run("Diğer", "El kitapları, bordrolar, sözleşmeler", "diger", "#64748b");
+            stmt.finalize();
+          }
+        });
+      }
+    });
 
     // Seed Users
     db.get("SELECT COUNT(*) as count FROM users", (err, row) => {

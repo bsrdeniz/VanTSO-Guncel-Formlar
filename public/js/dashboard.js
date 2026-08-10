@@ -3,7 +3,19 @@
 let allDocuments = [];
 let allSubmissions = [];
 let allEmployees = [];
+let allCategories = [];
 let selectedCategory = 'all';
+
+const iconMapping = {
+  all: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+  proses: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+  prosedur: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+  talimat: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`,
+  gorev: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+  form: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`,
+  plan: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+  diger: `<svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>`
+};
 
 // Modalları Açma / Kapatma
 function openModal(modalId) {
@@ -64,6 +76,7 @@ function initDashboard() {
 
 // Verileri Güncelleme
 async function refreshAllData() {
+  await loadCategories();
   await loadDocuments();
   await loadSubmissions();
   
@@ -81,6 +94,141 @@ async function refreshAllData() {
 // 1. VERİ YÜKLEME VE LİSTELEME
 // ==========================================
 
+// Kategorileri Çek
+async function loadCategories() {
+  try {
+    const response = await fetch('/api/categories');
+    if (response.ok) {
+      const data = await response.json();
+      allCategories = data.categories;
+      renderCategoryCards();
+      populateCategoryDropdown();
+    }
+  } catch (error) {
+    console.error('Kategoriler yüklenemedi:', error);
+  }
+}
+
+// Kategorileri Arayüzde Kart Olarak Listele (Dinamik Sayaçlarla)
+function renderCategoryCards() {
+  const container = document.getElementById('categories-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // 1. Tüm Belgeler Kartı
+  const allCount = allDocuments.length;
+  const allCard = document.createElement('div');
+  allCard.className = `filter-card ${selectedCategory === 'all' ? 'active' : ''}`;
+  allCard.setAttribute('data-category', 'all');
+  allCard.setAttribute('style', '--card-index: 1; --accent-color: #0d3a5f;');
+  allCard.innerHTML = `
+    <div class="filter-card-icon-box all">
+      ${iconMapping['all']}
+    </div>
+    <div class="filter-card-content">
+      <h3 class="filter-card-title">Tüm Belgeler</h3>
+      <p class="filter-card-desc">Sistemdeki tüm güncel belgeler</p>
+      <span class="filter-card-count" id="count-all">${allCount} Belge</span>
+    </div>
+  `;
+  container.appendChild(allCard);
+
+  // 2. Veritabanından Gelen Kategoriler
+  const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
+
+  allCategories.forEach((cat, index) => {
+    let count = 0;
+    if (cat.name === 'Diğer') {
+      // Diğer kategorisi için diğer tüm eşleşmeyenleri de sayalım
+      count = allDocuments.filter(d => otherCategories.includes(d.category) || d.category === 'Diğer' || !allCategories.some(c => c.name === d.category)).length;
+    } else {
+      count = allDocuments.filter(d => d.category === cat.name).length;
+    }
+
+    const card = document.createElement('div');
+    card.className = `filter-card ${selectedCategory === cat.name ? 'active' : ''}`;
+    card.setAttribute('data-category', cat.name);
+    card.setAttribute('style', `--card-index: ${index + 2}; --accent-color: ${cat.color};`);
+    
+    // Aktif kart ise inline stili temiz tutalım (CSS class'ı kontrol edecek), pasif ise kendi renk tonunu kullanalım
+    const isActive = selectedCategory === cat.name;
+    const activeIconStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}14;`;
+    const activeCountStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}0f;`;
+
+    card.innerHTML = `
+      <div class="filter-card-icon-box ${cat.icon}" style="${activeIconStyle}">
+        ${iconMapping[cat.icon] || iconMapping['diger']}
+      </div>
+      <div class="filter-card-content">
+        <h3 class="filter-card-title">${cat.name}ler</h3>
+        <p class="filter-card-desc">${cat.description || ''}</p>
+        <span class="filter-card-count" id="count-${cat.id}" style="${activeCountStyle}">${count} Belge</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // 3. İK Yetkilileri için "Yeni Kategori Ekle" Kartı
+  if (currentUser && currentUser.role === 'hr') {
+    const addCard = document.createElement('div');
+    addCard.className = 'filter-card add-new-category-card';
+    addCard.setAttribute('style', `--card-index: ${allCategories.length + 2}; border: 2px dashed var(--border-color); background: rgba(0,0,0,0.01); display: flex; align-items: center; justify-content: center;`);
+    addCard.onclick = (e) => {
+      e.stopPropagation();
+      openModal('modal-add-category');
+    };
+    addCard.innerHTML = `
+      <div class="filter-card-icon-box" style="background: rgba(13, 58, 95, 0.05); color: var(--primary);">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </div>
+      <div class="filter-card-content">
+        <h3 class="filter-card-title">Kategori Ekle</h3>
+        <p class="filter-card-desc">Yeni bir dosya grubu kartı oluştur</p>
+      </div>
+    `;
+    container.appendChild(addCard);
+  }
+
+  // Olay yöneticilerini dinamik oluşturulan kartlara bağla
+  container.querySelectorAll('.filter-card:not(.add-new-category-card)').forEach(card => {
+    card.addEventListener('click', () => {
+      container.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      
+      selectedCategory = card.getAttribute('data-category');
+      
+      const cardTitle = card.querySelector('.filter-card-title').textContent;
+      const cardCount = card.querySelector('.filter-card-count').textContent;
+      
+      const activeTitle = document.getElementById('active-category-title');
+      const activeCount = document.getElementById('active-category-count');
+      if (activeTitle) activeTitle.textContent = cardTitle;
+      if (activeCount) activeCount.textContent = cardCount;
+      
+      renderDocuments();
+      
+      const categoriesPage = document.getElementById('view-categories-page');
+      const documentsPage = document.getElementById('view-documents-page');
+      if (categoriesPage) categoriesPage.classList.add('hidden');
+      if (documentsPage) documentsPage.classList.remove('hidden');
+    });
+  });
+}
+
+// Belge Yükleme Modalındaki Kategori Seçim Listesini Doldur
+function populateCategoryDropdown() {
+  const select = document.getElementById('upload-category');
+  if (!select) return;
+  select.innerHTML = '';
+  
+  allCategories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.name;
+    opt.textContent = cat.name;
+    select.appendChild(opt);
+  });
+}
+
 // Belgeleri Çek
 async function loadDocuments() {
   try {
@@ -88,60 +236,13 @@ async function loadDocuments() {
     if (response.ok) {
       const data = await response.json();
       allDocuments = data.documents;
-      updateCategoryCounts();
+      renderCategoryCards();
       renderDocuments();
     }
   } catch (error) {
     console.error('Belgeler yüklenemedi:', error);
     showToast('Belgeler yüklenirken hata oluştu.', 'error');
   }
-}
-
-function updateCategoryCounts() {
-  const counts = {
-    all: allDocuments.length,
-    'Proses Kartı': 0,
-    'Prosedür': 0,
-    'Talimat': 0,
-    'Görev Tanımı': 0,
-    'Form': 0,
-    'Plan': 0,
-    'Diğer': 0
-  };
-
-  const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
-
-  allDocuments.forEach(doc => {
-    if (counts[doc.category] !== undefined) {
-      counts[doc.category]++;
-    } else {
-      counts['Diğer']++;
-    }
-  });
-
-  const countAll = document.getElementById('count-all');
-  if (countAll) countAll.textContent = `${counts['all']} Belge`;
-
-  const countProses = document.getElementById('count-proses');
-  if (countProses) countProses.textContent = `${counts['Proses Kartı']} Belge`;
-
-  const countProsedur = document.getElementById('count-prosedur');
-  if (countProsedur) countProsedur.textContent = `${counts['Prosedür']} Belge`;
-
-  const countTalimat = document.getElementById('count-talimat');
-  if (countTalimat) countTalimat.textContent = `${counts['Talimat']} Belge`;
-
-  const countGorev = document.getElementById('count-gorev');
-  if (countGorev) countGorev.textContent = `${counts['Görev Tanımı']} Belge`;
-
-  const countForm = document.getElementById('count-form');
-  if (countForm) countForm.textContent = `${counts['Form']} Belge`;
-
-  const countPlan = document.getElementById('count-plan');
-  if (countPlan) countPlan.textContent = `${counts['Plan']} Belge`;
-
-  const countDiger = document.getElementById('count-diger');
-  if (countDiger) countDiger.textContent = `${counts['Diğer']} Belge`;
 }
 
 // Türkçe karakter uyumlu küçük harf çevirici (Arama doğruluğu için)
@@ -873,6 +974,41 @@ function setupDashboardEventListeners() {
       } catch (error) {
         console.error('Form gönderim hatası:', error);
         showToast('Form gönderilirken hata oluştu.', 'error');
+      }
+    });
+  // 4. İK Yeni Kategori Oluşturma Formu
+  const formAddCategory = document.getElementById('form-add-category');
+  if (formAddCategory) {
+    formAddCategory.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('cat-name').value.trim();
+      const description = document.getElementById('cat-description').value.trim();
+      const icon = document.getElementById('cat-icon').value;
+      const color = document.getElementById('cat-color').value;
+
+      try {
+        showToast('Kategori oluşturuluyor...', 'info');
+        const response = await fetch('/api/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, description, icon, color })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          showToast('Yeni kategori başarıyla oluşturuldu!', 'success');
+          closeModal('modal-add-category');
+          formAddCategory.reset();
+          await refreshAllData();
+        } else {
+          showToast(data.error || 'Kategori oluşturulamadı.', 'error');
+        }
+      } catch (error) {
+        console.error('Kategori oluşturma hatası:', error);
+        showToast('İstek sırasında bir hata oluştu.', 'error');
       }
     });
   }

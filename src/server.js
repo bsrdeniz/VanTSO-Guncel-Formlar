@@ -526,6 +526,44 @@ app.delete('/api/documents/:id', requireAuth, requireRole('hr'), (req, res) => {
       res.json({ message: 'Belge başarıyla silindi.' });
     });
   });
+});// === KATEGORİ ENDPOINTS ===
+
+// Kategorileri Listele
+app.get('/api/categories', requireAuth, (req, res) => {
+  db.all('SELECT * FROM categories ORDER BY id ASC', (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Kategoriler yüklenemedi.' });
+    }
+    res.json({ categories: rows || [] });
+  });
+});
+
+// Yeni Kategori Ekle (Sadece İK Yetkilileri yapabilir)
+app.post('/api/categories', requireAuth, requireRole('hr'), (req, res) => {
+  const { name, description, icon, color } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'Kategori adı gereklidir.' });
+  }
+
+  // Varsayılan ikon ve renk belirle
+  const finalIcon = icon || 'diger';
+  const finalColor = color || '#64748b';
+
+  db.run(`
+    INSERT INTO categories (name, description, icon, color)
+    VALUES (?, ?, ?, ?)
+  `, [name, description, finalIcon, finalColor], function(err) {
+    if (err) {
+      if (err.message.includes('UNIQUE')) {
+        return res.status(400).json({ error: 'Bu kategori zaten mevcut.' });
+      }
+      return res.status(500).json({ error: 'Kategori eklenemedi.' });
+    }
+    res.status(201).json({ 
+      message: 'Kategori başarıyla eklendi.', 
+      category: { id: this.lastID, name, description, icon: finalIcon, color: finalColor } 
+    });
+  });
 });
 
 
