@@ -155,9 +155,9 @@ function renderCategoryCards() {
     const activeIconStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}14;`;
     const activeCountStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}0f;`;
 
-    // Sistem kategorileri (ID <= 7) silinemez, sadece özel kategoriler silinebilir
-    const isCustom = cat.id > 7;
-    const menuBtnHtml = (isCustom && currentUser && currentUser.role === 'hr') ? `
+    // Diğer kategorisi hariç tüm kategoriler düzenlenebilir ve silinebilir
+    const canManage = cat.name !== 'Diğer';
+    const menuBtnHtml = (canManage && currentUser && currentUser.role === 'hr') ? `
       <div class="category-menu-container" onclick="event.stopPropagation();">
         <button class="category-menu-btn" title="Kategori İşlemleri" onclick="toggleCategoryMenu(event, ${cat.id})">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>

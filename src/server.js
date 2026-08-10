@@ -564,14 +564,65 @@ app.post('/api/categories', requireAuth, requireRole('hr'), (req, res) => {
       category: { id: this.lastID, name, description, icon: finalIcon, color: finalColor } 
     });
   });
-});// Kategori Sil (Sadece İK Yetkilileri yapabilir)
+});
+
+// Kategori Güncelle (Sadece İK Yetkilileri yapabilir)
+app.put('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
+  const { id } = req.params;
+  const { name, description, icon, color, oldName } = req.body;
+  
+  if (!name) {
+    return res.status(400).json({ error: 'Kategori adı gereklidir.' });
+  }
+
+  // 1. Kategorinin 'Diğer' olup olmadığını kontrol et
+  db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
+    if (err) {
+      return res.status(500).json({ error: 'Veritabanı hatası oluştu.' });
+    }
+    if (!category) {
+      return res.status(404).json({ error: 'Kategori bulunamadı.' });
+    }
+    
+    if (category.name === 'Diğer') {
+      return res.status(400).json({ error: 'Diğer kategorisi güncellenemez.' });
+    }
+
+    const finalIcon = icon || 'diger';
+    const finalColor = color || '#64748b';
+
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      // 2. Kategoriyi güncelle
+      db.run(`
+        UPDATE categories
+        SET name = ?, description = ?, icon = ?, color = ?
+        WHERE id = ?
+      `, [name, description, finalIcon, finalColor, id]);
+
+      // 3. Eğer isim değiştiyse, bu kategoriye ait tüm belgeleri de yeni isimle güncelle
+      if (oldName && oldName !== name) {
+        db.run('UPDATE documents SET category = ? WHERE category = ?', [name, oldName]);
+      }
+
+      db.run('COMMIT', (commitErr) => {
+        if (commitErr) {
+          if (commitErr.message.includes('UNIQUE')) {
+            return res.status(400).json({ error: 'Bu isimde bir kategori zaten mevcut.' });
+          }
+          return res.status(500).json({ error: 'Kategori güncellenemedi.' });
+        }
+        res.json({ message: 'Kategori başarıyla güncellendi.' });
+      });
+    });
+  });
+});
+
+// Kategori Sil (Sadece İK Yetkilileri yapabilir)
 app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
   const { id } = req.params;
   
-  if (parseInt(id) <= 7) {
-    return res.status(400).json({ error: 'Sistem varsayılan kategorileri silinemez.' });
-  }
-
   // 1. Kategorinin adını öğren
   db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
     if (err) {
@@ -579,6 +630,10 @@ app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => 
     }
     if (!category) {
       return res.status(404).json({ error: 'Kategori bulunamadı.' });
+    }
+
+    if (category.name === 'Diğer') {
+      return res.status(400).json({ error: 'Diğer kategorisi silinemez.' });
     }
 
     const categoryName = category.name;
