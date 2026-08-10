@@ -1973,7 +1973,7 @@ tr:hover td {
   margin-bottom: 32px;
   box-shadow: 0 10px 30px rgba(13, 58, 95, 0.15) !important;
   position: relative;
-  overflow: hidden;
+  overflow: visible !important;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -2096,7 +2096,7 @@ tr:hover td {
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   opacity: 0;
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-delay: calc(var(--card-index) * 0.06s);
@@ -2123,6 +2123,7 @@ tr:hover td {
   height: 100%;
   background: transparent;
   transition: background-color 0.3s ease;
+  border-radius: 16px 0 0 16px;
 }
 
 .filter-card-icon-box {
