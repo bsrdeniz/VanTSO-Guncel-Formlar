@@ -137,13 +137,9 @@ function renderCategoryCards() {
   const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
 
   allCategories.forEach((cat, index) => {
-    let count = 0;
-    if (cat.name === 'Diğer') {
-      // Diğer kategorisi için diğer tüm eşleşmeyenleri de sayalım
-      count = allDocuments.filter(d => otherCategories.includes(d.category) || d.category === 'Diğer' || !allCategories.some(c => c.name === d.category)).length;
-    } else {
-      count = allDocuments.filter(d => d.category === cat.name).length;
-    }
+    if (cat.name === 'Diğer') return; // Diğer kartının arayüzde gösterilmesine gerek yok
+    
+    const count = allDocuments.filter(d => d.category === cat.name).length;
 
     const card = document.createElement('div');
     card.className = `filter-card ${selectedCategory === cat.name ? 'active' : ''}`;
@@ -243,6 +239,7 @@ function populateCategoryDropdown() {
   select.innerHTML = '';
   
   allCategories.forEach(cat => {
+    if (cat.name === 'Diğer') return; // Yükleme listesinde 'Diğer' seçeneğine gerek yok
     const opt = document.createElement('option');
     opt.value = cat.name;
     opt.textContent = cat.name;
