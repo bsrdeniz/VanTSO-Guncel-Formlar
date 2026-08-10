@@ -52,6 +52,12 @@ function initDashboard() {
     window.dashEventsBound = true;
   }
 
+  // Her zaman kategori seçim sayfası ile başla
+  const categoriesPage = document.getElementById('view-categories-page');
+  const documentsPage = document.getElementById('view-documents-page');
+  if (categoriesPage) categoriesPage.classList.remove('hidden');
+  if (documentsPage) documentsPage.classList.add('hidden');
+
   // Verileri Sunucudan Yükle
   refreshAllData();
 }
@@ -670,15 +676,44 @@ async function processSubmission(subId, status) {
 // ==========================================
 function setupDashboardEventListeners() {
   
-  // Kategori Kartları (Kategori Filtreleme)
+  // Kategori Kartları (Kategori Filtreleme ve Sayfa Değişimi)
   document.querySelectorAll('.filter-card').forEach(card => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
+      
       selectedCategory = card.getAttribute('data-category');
+      
+      // Başlık ve Belge Sayısı alanlarını güncelle
+      const cardTitle = card.querySelector('.filter-card-title').textContent;
+      const cardCount = card.querySelector('.filter-card-count').textContent;
+      
+      const activeTitle = document.getElementById('active-category-title');
+      const activeCount = document.getElementById('active-category-count');
+      if (activeTitle) activeTitle.textContent = cardTitle;
+      if (activeCount) activeCount.textContent = cardCount;
+      
+      // Belgeleri listele
       renderDocuments();
+      
+      // Görünümleri değiştir (Sayfa geçişi)
+      const categoriesPage = document.getElementById('view-categories-page');
+      const documentsPage = document.getElementById('view-documents-page');
+      if (categoriesPage) categoriesPage.classList.add('hidden');
+      if (documentsPage) documentsPage.classList.remove('hidden');
     });
   });
+
+  // Kategorilere Geri Dön Butonu
+  const btnBack = document.getElementById('btn-back-to-categories');
+  if (btnBack) {
+    btnBack.addEventListener('click', () => {
+      const categoriesPage = document.getElementById('view-categories-page');
+      const documentsPage = document.getElementById('view-documents-page');
+      if (documentsPage) documentsPage.classList.add('hidden');
+      if (categoriesPage) categoriesPage.classList.remove('hidden');
+    });
+  }
 
   // Arama Girişi Dinleyicisi (Input & Enter Tuşu)
   const searchInput = document.getElementById('doc-search');
