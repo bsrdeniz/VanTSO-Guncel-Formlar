@@ -157,14 +157,26 @@ function renderCategoryCards() {
 
     // Sistem kategorileri (ID <= 7) silinemez, sadece özel kategoriler silinebilir
     const isCustom = cat.id > 7;
-    const deleteBtnHtml = (isCustom && currentUser && currentUser.role === 'hr') ? `
-      <button class="delete-category-card-btn" title="Kategoriyi Sil" onclick="event.stopPropagation(); deleteCategory(${cat.id}, '${cat.name}')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-      </button>
+    const menuBtnHtml = (isCustom && currentUser && currentUser.role === 'hr') ? `
+      <div class="category-menu-container" onclick="event.stopPropagation();">
+        <button class="category-menu-btn" title="Kategori İşlemleri" onclick="toggleCategoryMenu(event, ${cat.id})">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>
+        </button>
+        <div class="category-dropdown-menu hidden" id="cat-dropdown-${cat.id}">
+          <button type="button" onclick="openEditCategoryModal(${cat.id}, '${cat.name.replace(/'/g, "\\'")}', '${(cat.description || '').replace(/'/g, "\\'")}', '${cat.icon}', '${cat.color}')">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Düzenle
+          </button>
+          <button type="button" class="delete" onclick="deleteCategory(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Sil
+          </button>
+        </div>
+      </div>
     ` : '';
 
     card.innerHTML = `
-      ${deleteBtnHtml}
+      ${menuBtnHtml}
       <div class="filter-card-icon-box ${cat.icon}" style="${activeIconStyle}">
         ${iconMapping[cat.icon] || iconMapping['diger']}
       </div>
@@ -1043,6 +1055,45 @@ function setupDashboardEventListeners() {
       }
     });
   }
+
+  // 5. İK Kategori Güncelleme Formu
+  const formEditCategory = document.getElementById('form-edit-category');
+  if (formEditCategory) {
+    formEditCategory.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('edit-cat-id').value;
+      const oldName = document.getElementById('edit-cat-old-name').value;
+      const name = document.getElementById('edit-cat-name').value.trim();
+      const description = document.getElementById('edit-cat-description').value.trim();
+      const icon = document.getElementById('edit-cat-icon').value;
+      const color = document.getElementById('edit-cat-color').value;
+
+      try {
+        showToast('Kategori güncelleniyor...', 'info');
+        const response = await fetch(`/api/categories/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, description, icon, color, oldName })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          showToast('Kategori başarıyla güncellendi!', 'success');
+          closeModal('modal-edit-category');
+          formEditCategory.reset();
+          await refreshAllData();
+        } else {
+          showToast(data.error || 'Kategori güncellenemedi.', 'error');
+        }
+      } catch (error) {
+        console.error('Kategori güncelleme hatası:', error);
+        showToast('Sunucu ile iletişim kurulamadı.', 'error');
+      }
+    });
+  }
 }
 
 // Sürükle Bırak Altyapısı (Helper)
@@ -1198,6 +1249,41 @@ async function deleteCategory(catId, catName) {
     console.error('Kategori silme hatası:', error);
     showToast('Sunucu ile iletişim kurulamadı.', 'error');
   }
+}
+
+// Kategori Menüsünü Aç/Kapat
+function toggleCategoryMenu(event, catId) {
+  event.stopPropagation();
+  const dropdown = document.getElementById(`cat-dropdown-${catId}`);
+  if (!dropdown) return;
+  const isHidden = dropdown.classList.contains('hidden');
+  
+  // Tüm diğer açık menüleri kapat
+  document.querySelectorAll('.category-dropdown-menu').forEach(m => m.classList.add('hidden'));
+  
+  if (isHidden) {
+    dropdown.classList.remove('hidden');
+  }
+}
+
+// Sayfa geneline tıklandığında açık kategori menülerini kapat
+document.addEventListener('click', () => {
+  document.querySelectorAll('.category-dropdown-menu').forEach(m => m.classList.add('hidden'));
+});
+
+// Düzenleme Modalını Aç
+function openEditCategoryModal(id, name, description, icon, color) {
+  // Açık olan tüm kategori menülerini kapat
+  document.querySelectorAll('.category-dropdown-menu').forEach(m => m.classList.add('hidden'));
+
+  document.getElementById('edit-cat-id').value = id;
+  document.getElementById('edit-cat-old-name').value = name;
+  document.getElementById('edit-cat-name').value = name;
+  document.getElementById('edit-cat-description').value = description;
+  document.getElementById('edit-cat-icon').value = icon;
+  document.getElementById('edit-cat-color').value = color;
+
+  openModal('modal-edit-category');
 }
 
 // ==========================================

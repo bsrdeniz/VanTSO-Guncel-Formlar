@@ -432,6 +432,65 @@
     </div>
   </div>
 
+  <!-- 6. Kategori Düzenleme Modalı (Sadece İK Yetkilileri Görebilir) -->
+  <div id="modal-edit-category" class="modal-overlay hidden">
+    <div class="modal-content text-left" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>Kategoriyi Düzenle</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-edit-category')">&times;</button>
+      </div>
+      <form id="form-edit-category">
+        <input type="hidden" id="edit-cat-id">
+        <input type="hidden" id="edit-cat-old-name">
+        <div class="modal-body" style="padding: 24px;">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="edit-cat-name">Kategori Adı</label>
+            <input type="text" id="edit-cat-name" required placeholder="Örn: Yönetmelik, Tüzük, Protokol">
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="edit-cat-description">Kategori Açıklaması</label>
+            <input type="text" id="edit-cat-description" required placeholder="Örn: Kurumsal tüzük ve yönetmelik belgeleri">
+          </div>
+
+          <div class="form-row" style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="edit-cat-icon">Kart İkonu</label>
+              <select id="edit-cat-icon" required style="width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; height: 42px;">
+                <option value="all">Kutu İkonu</option>
+                <option value="proses">Proses Akış İkonu</option>
+                <option value="prosedur">Klasör İkonu</option>
+                <option value="talimat">Onay/Tik İkonu</option>
+                <option value="gorev">Çalışan İkonu</option>
+                <option value="form">Belge İkonu</option>
+                <option value="plan">Takvim/Plan İkonu</option>
+                <option value="diger">Üç Nokta İkonu</option>
+              </select>
+            </div>
+            
+            <div class="form-group" style="flex: 1;">
+              <label for="edit-cat-color">Tema Rengi</label>
+              <select id="edit-cat-color" required style="width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; height: 42px;">
+                <option value="#f59e0b">Turuncu</option>
+                <option value="#3b82f6">Mavi</option>
+                <option value="#10b981">Yeşil</option>
+                <option value="#6366f1">Çivit Mavisi (Indigo)</option>
+                <option value="#ec4899">Pembe</option>
+                <option value="#0ea5e9">Gök Mavisi (Cyan)</option>
+                <option value="#7c3aed">Mor</option>
+                <option value="#64748b">Slate Grisi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color);">
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-edit-category')">İptal</button>
+          <button type="submit" class="btn-primary">Değişiklikleri Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Hidden File Input for Document Update -->
   <input type="file" id="global-update-file-input" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx">
 

@@ -2307,14 +2307,18 @@ tr:hover td {
   border-color: #475569;
 }
 
-/* Category Card Delete Button Style */
-.delete-category-card-btn {
+/* Category Card Options Dropdown Styles */
+.category-menu-container {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  z-index: 20;
+}
+
+.category-menu-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   border-radius: 50%;
   width: 26px;
   height: 26px;
@@ -2325,21 +2329,69 @@ tr:hover td {
   opacity: 0;
   transform: scale(0.9);
   transition: all 0.2s ease;
-  z-index: 10;
+  box-shadow: var(--shadow-sm);
 }
 
-.filter-card:hover .delete-category-card-btn {
+.filter-card:hover .category-menu-btn {
   opacity: 1;
   transform: scale(1);
 }
 
-.delete-category-card-btn:hover {
-  background: #ef4444 !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
-  transform: scale(1.1) !important;
+.category-menu-btn:hover {
+  background: var(--bg-surface);
+  color: var(--primary);
+  border-color: var(--primary-light);
 }
 
-.delete-category-card-btn svg {
-  pointer-events: none;
+.category-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  min-width: 120px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-dropdown-menu button {
+  background: none;
+  border: none;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.category-dropdown-menu button:hover {
+  background: var(--bg-body);
+  color: var(--primary);
+}
+
+.category-dropdown-menu button.delete {
+  color: #ef4444;
+}
+
+.category-dropdown-menu button.delete:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+
+.dark-mode .category-menu-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
 }
