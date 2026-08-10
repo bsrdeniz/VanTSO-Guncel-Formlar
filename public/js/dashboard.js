@@ -155,7 +155,16 @@ function renderCategoryCards() {
     const activeIconStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}14;`;
     const activeCountStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}0f;`;
 
+    // Sistem kategorileri (ID <= 7) silinemez, sadece özel kategoriler silinebilir
+    const isCustom = cat.id > 7;
+    const deleteBtnHtml = (isCustom && currentUser && currentUser.role === 'hr') ? `
+      <button class="delete-category-card-btn" title="Kategoriyi Sil" onclick="event.stopPropagation(); deleteCategory(${cat.id}, '${cat.name}')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      </button>
+    ` : '';
+
     card.innerHTML = `
+      ${deleteBtnHtml}
       <div class="filter-card-icon-box ${cat.icon}" style="${activeIconStyle}">
         ${iconMapping[cat.icon] || iconMapping['diger']}
       </div>
@@ -1136,6 +1145,36 @@ async function deleteDocument(docId) {
     }
   } catch (error) {
     console.error('Belge silme hatası:', error);
+    showToast('Sunucu ile iletişim kurulamadı.', 'error');
+  }
+}
+
+// Kategori Silme İşlemi (Sadece İK)
+async function deleteCategory(catId, catName) {
+  const confirmMsg = `"${catName}" kategorisini silmek istediğinize emin misiniz?\n\nBu kategoriye bağlı tüm belgeler "Diğer" kategorisine aktarılacaktır.`;
+  if (!window.confirm(confirmMsg)) return;
+
+  try {
+    showToast('Kategori siliniyor...', 'info');
+    const response = await fetch(`/api/categories/${catId}`, {
+      method: 'DELETE'
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      showToast('Kategori başarıyla silindi.', 'success');
+      
+      // Eğer silinen kategori şu an seçiliyse seçimi 'all' yapalım
+      if (selectedCategory === catName) {
+        selectedCategory = 'all';
+      }
+      
+      await refreshAllData();
+    } else {
+      showToast(data.error || 'Kategori silinemedi.', 'error');
+    }
+  } catch (error) {
+    console.error('Kategori silme hatası:', error);
     showToast('Sunucu ile iletişim kurulamadı.', 'error');
   }
 }

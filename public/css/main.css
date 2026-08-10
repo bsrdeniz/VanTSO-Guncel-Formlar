@@ -2306,3 +2306,40 @@ tr:hover td {
   background: #334155;
   border-color: #475569;
 }
+
+/* Category Card Delete Button Style */
+.delete-category-card-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.filter-card:hover .delete-category-card-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.delete-category-card-btn:hover {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+  transform: scale(1.1) !important;
+}
+
+.delete-category-card-btn svg {
+  pointer-events: none;
+}

@@ -564,6 +564,42 @@ app.post('/api/categories', requireAuth, requireRole('hr'), (req, res) => {
       category: { id: this.lastID, name, description, icon: finalIcon, color: finalColor } 
     });
   });
+});// Kategori Sil (Sadece İK Yetkilileri yapabilir)
+app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
+  const { id } = req.params;
+  
+  if (parseInt(id) <= 7) {
+    return res.status(400).json({ error: 'Sistem varsayılan kategorileri silinemez.' });
+  }
+
+  // 1. Kategorinin adını öğren
+  db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
+    if (err) {
+      return res.status(500).json({ error: 'Veritabanı hatası oluştu.' });
+    }
+    if (!category) {
+      return res.status(404).json({ error: 'Kategori bulunamadı.' });
+    }
+
+    const categoryName = category.name;
+
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      // 2. Bu kategoriye ait tüm belgeleri "Diğer" kategorisine taşı
+      db.run('UPDATE documents SET category = ? WHERE category = ?', ['Diğer', categoryName]);
+
+      // 3. Kategoriyi sil
+      db.run('DELETE FROM categories WHERE id = ?', [id]);
+
+      db.run('COMMIT', (commitErr) => {
+        if (commitErr) {
+          return res.status(500).json({ error: 'Kategori silinemedi.' });
+        }
+        res.json({ message: 'Kategori başarıyla silindi. Bu kategoriye ait belgeler "Diğer" grubuna taşındı.' });
+      });
+    });
+  });
 });
 
 
