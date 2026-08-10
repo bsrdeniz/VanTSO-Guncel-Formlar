@@ -169,7 +169,7 @@ function renderCategoryCards() {
         ${iconMapping[cat.icon] || iconMapping['diger']}
       </div>
       <div class="filter-card-content">
-        <h3 class="filter-card-title">${cat.name}ler</h3>
+        <h3 class="filter-card-title">${getPluralName(cat.name)}</h3>
         <p class="filter-card-desc">${cat.description || ''}</p>
         <span class="filter-card-count" id="count-${cat.id}" style="${activeCountStyle}">${count} Belge</span>
       </div>
@@ -252,6 +252,27 @@ async function loadDocuments() {
     console.error('Belgeler yüklenemedi:', error);
     showToast('Belgeler yüklenirken hata oluştu.', 'error');
   }
+}
+
+// Türkçe dil bilgisi kurallarına göre çoğul ad üretimi
+function getPluralName(name) {
+  if (name === 'Proses Kartı') return 'Proses Kartları';
+  if (name === 'Prosedür') return 'Prosedürler';
+  if (name === 'Talimat') return 'Talimatlar';
+  if (name === 'Görev Tanımı') return 'Görev Tanımları';
+  if (name === 'Form') return 'Formlar';
+  if (name === 'Plan') return 'Planlar';
+  if (name === 'Diğer') return 'Diğer Belgeler';
+  
+  // Özel kategoriler için Türkçe büyük/küçük sesli uyumu kuralı
+  const lastVowelMatch = name.match(/[aıoueiöü]/gi);
+  if (lastVowelMatch && lastVowelMatch.length > 0) {
+    const vowel = lastVowelMatch[lastVowelMatch.length - 1].toLowerCase();
+    if (['a', 'ı', 'o', 'u'].includes(vowel)) {
+      return name + 'lar';
+    }
+  }
+  return name + 'ler';
 }
 
 // Türkçe karakter uyumlu küçük harf çevirici (Arama doğruluğu için)
