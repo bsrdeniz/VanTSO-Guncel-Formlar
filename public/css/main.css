@@ -66,10 +66,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme="dark"] .logo-area img {
-  filter: invert(1) hue-rotate(180deg) contrast(1.25) brightness(0.95);
-  mix-blend-mode: screen;
-}
+
 
 /* Theme Toggle Button Style */
 .theme-toggle-btn {
