@@ -75,16 +75,20 @@
        ========================================== -->
   <div id="app-screen" class="hidden">
     <!-- Üst Başlık (Header) -->
-    <header class="main-header">
-      <div class="header-container">
+    <!-- Birleşik Premium Başlık (Unified Premium Header) -->
+    <header class="main-header welcome-hero-card">
+      <div class="hero-bg-glow" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; border-radius: 0 0 24px 24px; z-index: 0;"></div>
+      <div class="header-container hero-top-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative; z-index: 1;">
         <div class="logo-area" id="header-logo" style="display: flex; align-items: center; gap: 14px;">
-          <img src="images/logo.png" alt="VANTSO Logo" style="height: 56px; width: auto; object-fit: contain;">
-          <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: -0.3px; font-family: 'Inter', sans-serif;">VANTSO GÜNCEL FORMLAR</h2>
+          <div class="brand-badge" style="background: #ffffff; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <img src="images/logo.png" alt="VANTSO Logo" style="height: 44px; width: auto; object-fit: contain;">
+          </div>
+          <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; font-family: 'Inter', sans-serif;">VANTSO GÜNCEL FORMLAR</h2>
         </div>
         
-        <div class="user-profile-area">
+        <div class="user-profile-area" style="display: flex; align-items: center;">
           <!-- Theme Toggle Button -->
-          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Temayı Değiştir">
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Temayı Değiştir" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.25); color: #ffffff; margin-right: 16px;">
             <!-- Sun Icon (Light Mode) -->
             <svg class="sun-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
@@ -104,13 +108,13 @@
           </button>
           
           <!-- User Profile Capsule -->
-          <div class="user-profile-capsule" id="profile-trigger">
-            <div class="user-avatar-circle" id="user-avatar-initials">BD</div>
-            <div class="user-details">
-              <span id="user-display-name" class="user-name">-</span>
-              <span id="user-display-role" class="user-role-text">-</span>
+          <div class="user-profile-capsule" id="profile-trigger" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.25); color: #ffffff; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 30px; cursor: pointer; transition: var(--transition-smooth); position: relative;">
+            <div class="user-avatar-circle" id="user-avatar-initials" style="background: #ffffff; color: #0d3a5f; font-weight: 800; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px;">BD</div>
+            <div class="user-details" style="display: flex; flex-direction: column; text-align: left;">
+              <span id="user-display-name" class="user-name" style="color: #ffffff; font-size: 13px; font-weight: 700; line-height: 1.2;">-</span>
+              <span id="user-display-role" class="user-role-text" style="color: rgba(255, 255, 255, 0.75); font-size: 10px; font-weight: 600;">-</span>
             </div>
-            <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff;">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
             
@@ -128,28 +132,18 @@
           </div>
         </div>
       </div>
+
+      <div class="hero-bottom-row" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px; width: 100%; position: relative; z-index: 1;">
+        <span class="welcome-hero-badge" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); padding: 4px 12px; border-radius: 30px; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: inline-block; margin-bottom: 8px;">VAN TSO DOKÜMAN MERKEZİ</span>
+        <p class="welcome-hero-subtitle" style="margin: 0; font-size: 13.5px; line-height: 1.6; color: rgba(255, 255, 255, 0.85);">
+          İhtiyacınız olan tüm kurumsal belgelere, formlara ve süreç akışlarına kategorize edilmiş bölümlerden hızlıca ulaşabilirsiniz.
+        </p>
+      </div>
     </header>
 
     <main class="app-container">
       <!-- GÖRÜNÜM 1: KATEGORİ SEÇİM SAYFASI -->
       <div id="view-categories-page" class="view-page">
-        <!-- Premium Hoş Geldiniz Bannerı -->
-        <div class="welcome-hero-card">
-          <div class="welcome-hero-content">
-            <span class="welcome-hero-badge">VAN TSO DOKÜMAN MERKEZİ</span>
-            <h1 class="welcome-hero-title">Belge & Yönetim Portalı</h1>
-            <p class="welcome-hero-subtitle">İhtiyacınız olan tüm kurumsal belgelere, formlara ve süreç akışlarına kategorize edilmiş bölümlerden hızlıca ulaşabilirsiniz.</p>
-          </div>
-          <div class="welcome-hero-illustration">
-            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-          </div>
-        </div>
 
         <div class="section-title-wrapper" style="margin-bottom: 24px;">
           <h2 class="section-title" style="font-size: 20px; font-weight: 800; color: var(--primary); margin: 0;">Doküman Kategorileri</h2>
