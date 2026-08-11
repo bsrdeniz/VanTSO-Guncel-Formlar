@@ -575,17 +575,13 @@ app.put('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
     return res.status(400).json({ error: 'Kategori adı gereklidir.' });
   }
 
-  // 1. Kategorinin 'Diğer' olup olmadığını kontrol et
+  // 1. Kategorinin var olduğunu doğrula
   db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
     if (err) {
       return res.status(500).json({ error: 'Veritabanı hatası oluştu.' });
     }
     if (!category) {
       return res.status(404).json({ error: 'Kategori bulunamadı.' });
-    }
-    
-    if (category.name === 'Diğer') {
-      return res.status(400).json({ error: 'Diğer kategorisi güncellenemez.' });
     }
 
     const finalIcon = icon || 'diger';
@@ -632,26 +628,40 @@ app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => 
       return res.status(404).json({ error: 'Kategori bulunamadı.' });
     }
 
-    if (category.name === 'Diğer') {
-      return res.status(400).json({ error: 'Diğer kategorisi silinemez.' });
-    }
-
     const categoryName = category.name;
 
-    db.serialize(() => {
-      db.run('BEGIN TRANSACTION');
+    // 2. Bu kategoriye ait tüm belgeleri seç (dosyalarını diskten silmek için)
+    db.all('SELECT filename FROM documents WHERE category = ?', [categoryName], (selectErr, docs) => {
+      if (!selectErr && docs) {
+        docs.forEach(doc => {
+          if (doc.filename) {
+            const filePath = path.join(uploadDir, doc.filename);
+            if (fs.existsSync(filePath)) {
+              try {
+                fs.unlinkSync(filePath);
+              } catch (unlinkErr) {
+                console.error('Kategori silinirken ilişkili dosya silinemedi:', unlinkErr);
+              }
+            }
+          }
+        });
+      }
 
-      // 2. Bu kategoriye ait tüm belgeleri "Diğer" kategorisine taşı
-      db.run('UPDATE documents SET category = ? WHERE category = ?', ['Diğer', categoryName]);
+      db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
 
-      // 3. Kategoriyi sil
-      db.run('DELETE FROM categories WHERE id = ?', [id]);
+        // 3. Bu kategoriye ait tüm belgeleri veritabanından sil
+        db.run('DELETE FROM documents WHERE category = ?', [categoryName]);
 
-      db.run('COMMIT', (commitErr) => {
-        if (commitErr) {
-          return res.status(500).json({ error: 'Kategori silinemedi.' });
-        }
-        res.json({ message: 'Kategori başarıyla silindi. Bu kategoriye ait belgeler "Diğer" grubuna taşındı.' });
+        // 4. Kategoriyi sil
+        db.run('DELETE FROM categories WHERE id = ?', [id]);
+
+        db.run('COMMIT', (commitErr) => {
+          if (commitErr) {
+            return res.status(500).json({ error: 'Kategori silinemedi.' });
+          }
+          res.json({ message: 'Kategori ve bağlı tüm belgeler başarıyla silindi.' });
+        });
       });
     });
   });

@@ -134,11 +134,7 @@ function renderCategoryCards() {
   container.appendChild(allCard);
 
   // 2. Veritabanından Gelen Kategoriler
-  const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
-
   allCategories.forEach((cat, index) => {
-    if (cat.name === 'Diğer') return; // Diğer kartının arayüzde gösterilmesine gerek yok
-    
     const count = allDocuments.filter(d => d.category === cat.name).length;
 
     const card = document.createElement('div');
@@ -151,8 +147,8 @@ function renderCategoryCards() {
     const activeIconStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}14;`;
     const activeCountStyle = isActive ? '' : `color: ${cat.color}; background: ${cat.color}0f;`;
 
-    // Diğer kategorisi hariç tüm kategoriler düzenlenebilir ve silinebilir
-    const canManage = cat.name !== 'Diğer';
+    // Tüm kategoriler düzenlenebilir ve silinebilir
+    const canManage = true;
     const menuBtnHtml = (canManage && currentUser && currentUser.role === 'hr') ? `
       <div class="category-menu-container" onclick="event.stopPropagation();">
         <button class="category-menu-btn" title="Kategori İşlemleri" onclick="toggleCategoryMenu(event, ${cat.id})">
@@ -239,7 +235,6 @@ function populateCategoryDropdown() {
   select.innerHTML = '';
   
   allCategories.forEach(cat => {
-    if (cat.name === 'Diğer') return; // Yükleme listesinde 'Diğer' seçeneğine gerek yok
     const opt = document.createElement('option');
     opt.value = cat.name;
     opt.textContent = cat.name;
@@ -271,7 +266,6 @@ function getPluralName(name) {
   if (name === 'Görev Tanımı') return 'Görev Tanımları';
   if (name === 'Form') return 'Formlar';
   if (name === 'Plan') return 'Planlar';
-  if (name === 'Diğer') return 'Diğer Belgeler';
   
   // Özel kategoriler için Türkçe büyük/küçük sesli uyumu kuralı
   const lastVowelMatch = name.match(/[aıoueiöü]/gi);
@@ -307,16 +301,8 @@ function renderDocuments() {
   
   const filtered = allDocuments.filter(doc => {
     // Kategori filtresi
-    // Kategori filtresi
-    if (selectedCategory !== 'all') {
-      if (selectedCategory === 'Diğer') {
-        const otherCategories = ['Diğer', 'El Kitabı', 'Bordro', 'İzin', 'Performans', 'Sözleşme', 'Genel Form'];
-        if (!otherCategories.includes(doc.category)) {
-          return false;
-        }
-      } else if (doc.category !== selectedCategory) {
-        return false;
-      }
+    if (selectedCategory !== 'all' && doc.category !== selectedCategory) {
+      return false;
     }
     // Arama sorgusu filtresi (Türkçe karakter uyumlu)
     if (searchQuery) {
@@ -1220,7 +1206,7 @@ async function deleteDocument(docId) {
 
 // Kategori Silme İşlemi (Sadece İK)
 async function deleteCategory(catId, catName) {
-  const confirmMsg = `"${catName}" kategorisini silmek istediğinize emin misiniz?\n\nBu kategoriye bağlı tüm belgeler "Diğer" kategorisine aktarılacaktır.`;
+  const confirmMsg = `"${catName}" kategorisini silmek istediğinize emin misiniz?\n\nUYARI: Bu kategoriye bağlı tüm belgeler de sistemden ve diskten kalıcı olarak silinecektir!`;
   if (!window.confirm(confirmMsg)) return;
 
   try {

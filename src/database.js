@@ -165,9 +165,11 @@ function createTablesAndSeed(forceSeed) {
             stmt.run("Görev Tanımı", "Kadro yetki ve sorumluluk detayları", "gorev", "#6366f1");
             stmt.run("Form", "Kullanıma hazır boş matbu formlar", "form", "#ec4899");
             stmt.run("Plan", "Kurumsal faaliyet ve eylem planları", "plan", "#0ea5e9");
-            stmt.run("Diğer", "El kitapları, bordrolar, sözleşmeler", "diger", "#64748b");
             stmt.finalize();
           }
+          // Mevcut veritabanında 'Diğer' kategorisini ve ona bağlı dokümanları temizleyen tek seferlik migrasyon
+          db.run("DELETE FROM categories WHERE name = 'Diğer'");
+          db.run("DELETE FROM documents WHERE category = 'Diğer'");
         });
       }
     });
