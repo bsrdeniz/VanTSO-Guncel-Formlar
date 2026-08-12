@@ -159,9 +159,13 @@ function renderCategoryCards() {
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             Düzenle
           </button>
-          <button type="button" class="delete" onclick="deleteCategory(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')" title="Bu kategorideki tüm belgeleri sil">
+          <button type="button" class="delete" onclick="clearCategoryContents(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')" title="Bu kategorideki tüm belgeleri sil">
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             İçeriği Sil
+          </button>
+          <button type="button" class="delete" onclick="deleteCategoryCard(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')" title="Kategori kartını ve tüm içeriğini tamamen sil">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+            Kartı Sil
           </button>
         </div>
       </div>
@@ -1205,19 +1209,43 @@ async function deleteDocument(docId) {
 }
 
 // Kategori İçeriğini Silme İşlemi (Sadece İK)
-async function deleteCategory(catId, catName) {
+async function clearCategoryContents(catId, catName) {
   const confirmMsg = `"${catName}" kategorisindeki tüm belgeleri kalıcı olarak silmek istediğinize emin misiniz?\n\nUYARI: Bu kategoriye ait tüm dosyalar diskten ve sistemden silinecektir, ancak "${catName}" kartı silinmeyecektir!`;
   if (!window.confirm(confirmMsg)) return;
 
   try {
     showToast('Kategori içeriği siliniyor...', 'info');
-    const response = await fetch(`/api/categories/${catId}`, {
+    const response = await fetch(`/api/categories/${catId}/contents`, {
       method: 'DELETE'
     });
 
     const data = await response.json();
     if (response.ok) {
       showToast('Kategori içeriği başarıyla silindi.', 'success');
+      await refreshAllData();
+    } else {
+      showToast(data.error || 'Kategori içeriği silinemedi.', 'error');
+    }
+  } catch (error) {
+    console.error('Kategori içeriği silme hatası:', error);
+    showToast('Sunucu ile iletişim kurulamadı.', 'error');
+  }
+}
+
+// Kategori Kartını ve İçeriğini Tamamen Silme İşlemi (Sadece İK)
+async function deleteCategoryCard(catId, catName) {
+  const confirmMsg = `"${catName}" kategori kartını ve içindeki TÜM belgeleri tamamen silmek istediğinize emin misiniz?\n\nUYARI: Bu işlem geri alınamaz! "${catName}" kartı ve tüm dosyaları sistemden ve diskten kalıcı olarak silinecektir!`;
+  if (!window.confirm(confirmMsg)) return;
+
+  try {
+    showToast('Kategori kartı siliniyor...', 'info');
+    const response = await fetch(`/api/categories/${catId}`, {
+      method: 'DELETE'
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      showToast('Kategori kartı ve içeriği başarıyla silindi.', 'success');
       
       // Eğer silinen kategori şu an seçiliyse seçimi 'all' yapalım
       if (selectedCategory === catName) {
@@ -1226,10 +1254,10 @@ async function deleteCategory(catId, catName) {
       
       await refreshAllData();
     } else {
-      showToast(data.error || 'Kategori silinemedi.', 'error');
+      showToast(data.error || 'Kategori kartı silinemedi.', 'error');
     }
   } catch (error) {
-    console.error('Kategori silme hatası:', error);
+    console.error('Kategori kartı silme hatası:', error);
     showToast('Sunucu ile iletişim kurulamadı.', 'error');
   }
 }

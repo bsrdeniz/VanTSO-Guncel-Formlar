@@ -615,11 +615,10 @@ app.put('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
   });
 });
 
-// Kategori İçeriğini Sil/Temizle (Sadece İK Yetkilileri yapabilir)
-app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
+// 1. Sadece Kategori İçeriğini Sil/Temizle (Sadece İK Yetkilileri yapabilir)
+app.delete('/api/categories/:id/contents', requireAuth, requireRole('hr'), (req, res) => {
   const { id } = req.params;
   
-  // 1. Kategorinin adını öğren
   db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
     if (err) {
       return res.status(500).json({ error: 'Veritabanı hatası oluştu.' });
@@ -630,7 +629,7 @@ app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => 
 
     const categoryName = category.name;
 
-    // 2. Bu kategoriye ait tüm belgeleri seç (dosyalarını diskten silmek için)
+    // Bu kategoriye ait tüm belgeleri seç (dosyalarını diskten silmek için)
     db.all('SELECT filename FROM documents WHERE category = ?', [categoryName], (selectErr, docs) => {
       if (!selectErr && docs) {
         docs.forEach(doc => {
@@ -647,12 +646,63 @@ app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => 
         });
       }
 
-      // 3. Bu kategoriye ait tüm belgeleri veritabanından sil
+      // Bu kategoriye ait tüm belgeleri veritabanından sil
       db.run('DELETE FROM documents WHERE category = ?', [categoryName], (deleteErr) => {
         if (deleteErr) {
           return res.status(500).json({ error: 'Kategori içeriği silinirken veritabanı hatası oluştu.' });
         }
         res.json({ message: `"${categoryName}" kategorisindeki tüm belgeler başarıyla silindi. Kart korunmuştur.` });
+      });
+    });
+  });
+});
+
+// 2. Kategori Kartını ve İçeriğini Tamamen Sil (Sadece İK Yetkilileri yapabilir)
+app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
+  const { id } = req.params;
+  
+  db.get('SELECT name FROM categories WHERE id = ?', [id], (err, category) => {
+    if (err) {
+      return res.status(500).json({ error: 'Veritabanı hatası oluştu.' });
+    }
+    if (!category) {
+      return res.status(404).json({ error: 'Kategori bulunamadı.' });
+    }
+
+    const categoryName = category.name;
+
+    // Bu kategoriye ait tüm belgeleri seç (dosyalarını diskten silmek için)
+    db.all('SELECT filename FROM documents WHERE category = ?', [categoryName], (selectErr, docs) => {
+      if (!selectErr && docs) {
+        docs.forEach(doc => {
+          if (doc.filename) {
+            const filePath = path.join(uploadDir, doc.filename);
+            if (fs.existsSync(filePath)) {
+              try {
+                fs.unlinkSync(filePath);
+              } catch (unlinkErr) {
+                console.error('Kategori silinirken ilişkili dosya silinemedi:', unlinkErr);
+              }
+            }
+          }
+        });
+      }
+
+      db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        // Bu kategoriye ait tüm belgeleri veritabanından sil
+        db.run('DELETE FROM documents WHERE category = ?', [categoryName]);
+
+        // Kategorinin kendisini sil
+        db.run('DELETE FROM categories WHERE id = ?', [id]);
+
+        db.run('COMMIT', (commitErr) => {
+          if (commitErr) {
+            return res.status(500).json({ error: 'Kategori silinemedi.' });
+          }
+          res.json({ message: `"${categoryName}" kategorisi ve bağlı tüm belgeler başarıyla silindi.` });
+        });
       });
     });
   });
