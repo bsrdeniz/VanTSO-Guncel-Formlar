@@ -159,9 +159,9 @@ function renderCategoryCards() {
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             Düzenle
           </button>
-          <button type="button" class="delete" onclick="deleteCategory(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')">
+          <button type="button" class="delete" onclick="deleteCategory(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')" title="Bu kategorideki tüm belgeleri sil">
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            Sil
+            İçeriği Sil
           </button>
         </div>
       </div>
@@ -1204,20 +1204,20 @@ async function deleteDocument(docId) {
   }
 }
 
-// Kategori Silme İşlemi (Sadece İK)
+// Kategori İçeriğini Silme İşlemi (Sadece İK)
 async function deleteCategory(catId, catName) {
-  const confirmMsg = `"${catName}" kategorisini silmek istediğinize emin misiniz?\n\nUYARI: Bu kategoriye bağlı tüm belgeler de sistemden ve diskten kalıcı olarak silinecektir!`;
+  const confirmMsg = `"${catName}" kategorisindeki tüm belgeleri kalıcı olarak silmek istediğinize emin misiniz?\n\nUYARI: Bu kategoriye ait tüm dosyalar diskten ve sistemden silinecektir, ancak "${catName}" kartı silinmeyecektir!`;
   if (!window.confirm(confirmMsg)) return;
 
   try {
-    showToast('Kategori siliniyor...', 'info');
+    showToast('Kategori içeriği siliniyor...', 'info');
     const response = await fetch(`/api/categories/${catId}`, {
       method: 'DELETE'
     });
 
     const data = await response.json();
     if (response.ok) {
-      showToast('Kategori başarıyla silindi.', 'success');
+      showToast('Kategori içeriği başarıyla silindi.', 'success');
       
       // Eğer silinen kategori şu an seçiliyse seçimi 'all' yapalım
       if (selectedCategory === catName) {

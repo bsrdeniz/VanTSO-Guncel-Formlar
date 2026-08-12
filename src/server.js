@@ -615,7 +615,7 @@ app.put('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
   });
 });
 
-// Kategori Sil (Sadece İK Yetkilileri yapabilir)
+// Kategori İçeriğini Sil/Temizle (Sadece İK Yetkilileri yapabilir)
 app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => {
   const { id } = req.params;
   
@@ -640,28 +640,19 @@ app.delete('/api/categories/:id', requireAuth, requireRole('hr'), (req, res) => 
               try {
                 fs.unlinkSync(filePath);
               } catch (unlinkErr) {
-                console.error('Kategori silinirken ilişkili dosya silinemedi:', unlinkErr);
+                console.error('Kategori içeriği temizlenirken ilişkili dosya silinemedi:', unlinkErr);
               }
             }
           }
         });
       }
 
-      db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-
-        // 3. Bu kategoriye ait tüm belgeleri veritabanından sil
-        db.run('DELETE FROM documents WHERE category = ?', [categoryName]);
-
-        // 4. Kategoriyi sil
-        db.run('DELETE FROM categories WHERE id = ?', [id]);
-
-        db.run('COMMIT', (commitErr) => {
-          if (commitErr) {
-            return res.status(500).json({ error: 'Kategori silinemedi.' });
-          }
-          res.json({ message: 'Kategori ve bağlı tüm belgeler başarıyla silindi.' });
-        });
+      // 3. Bu kategoriye ait tüm belgeleri veritabanından sil
+      db.run('DELETE FROM documents WHERE category = ?', [categoryName], (deleteErr) => {
+        if (deleteErr) {
+          return res.status(500).json({ error: 'Kategori içeriği silinirken veritabanı hatası oluştu.' });
+        }
+        res.json({ message: `"${categoryName}" kategorisindeki tüm belgeler başarıyla silindi. Kart korunmuştur.` });
       });
     });
   });
