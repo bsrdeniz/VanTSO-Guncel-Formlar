@@ -8,6 +8,78 @@ const pdfParse = require('pdf-parse');
 const db = require('./database');
 const { requireAuth, requireRole } = require('./middleware');
 
+const crypto = require('crypto');
+
+// ==========================================
+// ŞİFRELEME VE GÜVENLİK ALTYAPISI (AES-256)
+// ==========================================
+const algorithm = 'aes-256-cbc';
+const secretKeyRaw = process.env.FILE_ENCRYPTION_KEY || 'vantso_guvenli_dosya_anahtari_2026';
+const key = crypto.createHash('sha256').update(String(secretKeyRaw)).digest();
+const ivLength = 16;
+
+function encryptBuffer(buffer) {
+  const iv = crypto.randomBytes(ivLength);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+  return Buffer.concat([iv, encrypted]);
+}
+
+function decryptBuffer(buffer) {
+  const iv = buffer.subarray(0, ivLength);
+  const encryptedData = buffer.subarray(ivLength);
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  return Buffer.concat([decipher.update(encryptedData), decipher.final()]);
+}
+
+function getMimeType(filename) {
+  const ext = path.extname(filename).toLowerCase();
+  if (ext === '.pdf') return 'application/pdf';
+  if (ext === '.doc') return 'application/msword';
+  if (ext === '.docx') return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  if (ext === '.xls') return 'application/vnd.ms-excel';
+  if (ext === '.xlsx') return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if (ext === '.png') return 'image/png';
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  return 'application/octet-stream';
+}
+
+// Giriş Sınırlayıcı (Rate Limiting)
+const loginAttempts = new Map();
+const loginRateLimiter = (req, res, next) => {
+  const ip = req.ip;
+  const now = Date.now();
+  if (loginAttempts.has(ip)) {
+    const attempt = loginAttempts.get(ip);
+    if (attempt.lockUntil && now < attempt.lockUntil) {
+      const remainingTime = Math.ceil((attempt.lockUntil - now) / 1000);
+      return res.status(429).json({
+        error: `Çok fazla başarısız giriş denemesi yaptınız. Lütfen ${remainingTime} saniye sonra tekrar deneyin.`
+      });
+    }
+  }
+  next();
+};
+
+const recordFailedLogin = (ip) => {
+  const now = Date.now();
+  if (!loginAttempts.has(ip)) {
+    loginAttempts.set(ip, { count: 1, lockUntil: null });
+  } else {
+    const attempt = loginAttempts.get(ip);
+    attempt.count += 1;
+    if (attempt.count >= 5) {
+      attempt.lockUntil = now + 1000 * 60 * 15; // 15 dakika kilitle
+      attempt.count = 0;
+    }
+    loginAttempts.set(ip, attempt);
+  }
+};
+
+const resetLoginAttempts = (ip) => {
+  loginAttempts.delete(ip);
+};
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -99,7 +171,7 @@ const uploadEmployee = multer({
 // ==========================================
 
 // Giriş Yap
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', loginRateLimiter, (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -111,14 +183,19 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(500).json({ error: 'Sunucu hatası oluştu.' });
     }
     if (!user) {
+      recordFailedLogin(req.ip);
       return res.status(401).json({ error: 'Geçersiz e-posta adresi veya şifre.' });
     }
 
     // Şifreyi doğrula
     const passwordMatch = bcrypt.compareSync(password, user.password_hash);
     if (!passwordMatch) {
+      recordFailedLogin(req.ip);
       return res.status(401).json({ error: 'Geçersiz e-posta adresi veya şifre.' });
     }
+
+    // Başarılı girişte deneme sayacını sıfırla
+    resetLoginAttempts(req.ip);
 
     // Oturumu kaydet
     req.session.userId = user.id;
@@ -400,6 +477,17 @@ app.post('/api/documents/upload', requireAuth, requireRole('hr'), uploadHr.singl
   if (!finalFirstPublish) finalFirstPublish = todayStr;
   if (!finalLastRevision) finalLastRevision = finalFirstPublish;
 
+  // Dosyayı şifrele
+  try {
+    const rawBuffer = fs.readFileSync(file.path);
+    const encrypted = encryptBuffer(rawBuffer);
+    fs.writeFileSync(file.path, encrypted);
+  } catch (encErr) {
+    console.error('Dosya şifreleme hatası:', encErr);
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    return res.status(500).json({ error: 'Dosya kaydedilirken şifreleme hatası oluştu.' });
+  }
+
   db.run(`
     INSERT INTO documents (title, original_filename, filename, category, type, visibility, target_id, uploaded_by, document_code, first_publish_date, revision_no, last_revision_date, related_department)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -459,6 +547,17 @@ app.post('/api/documents/update-file/:id', requireAuth, requireRole('hr'), uploa
     const lastRevDate = `${dd}.${mm}.${yyyy}`;
 
     // Veritabanını güncelle
+    // Yeni dosyayı şifrele
+    try {
+      const rawBuffer = fs.readFileSync(file.path);
+      const encrypted = encryptBuffer(rawBuffer);
+      fs.writeFileSync(file.path, encrypted);
+    } catch (encErr) {
+      console.error('Dosya güncelleme şifreleme hatası:', encErr);
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      return res.status(500).json({ error: 'Yeni dosya kaydedilirken şifreleme hatası oluştu.' });
+    }
+
     db.run(`
       UPDATE documents
       SET original_filename = ?,
@@ -797,11 +896,27 @@ app.get('/api/documents/download/:id', requireAuth, (req, res) => {
       }
     });
 
-    // Dosyayı güvenli bir şekilde indir veya önizle
-    if (req.query.preview === 'true') {
-      res.sendFile(filePath);
-    } else {
-      res.download(filePath, doc.original_filename);
+    // Dosyayı oku ve şifresini çöz
+    try {
+      const encryptedBuffer = fs.readFileSync(filePath);
+      let decryptedBuffer;
+      try {
+        decryptedBuffer = decryptBuffer(encryptedBuffer);
+      } catch (decryptErr) {
+        // Eski (şifrelenmemiş) dosyaların uyumluluğu için as-is gönder
+        decryptedBuffer = encryptedBuffer;
+      }
+
+      res.setHeader('Content-Type', getMimeType(doc.original_filename));
+      if (req.query.preview === 'true') {
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(doc.original_filename)}"`);
+      } else {
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(doc.original_filename)}"`);
+      }
+      res.send(decryptedBuffer);
+    } catch (readErr) {
+      console.error('Dosya okuma hatası:', readErr);
+      res.status(500).json({ error: 'Dosya okunurken sunucu hatası oluştu.' });
     }
   });
 });
@@ -825,6 +940,17 @@ app.post('/api/submissions/upload', requireAuth, uploadEmployee.single('file'), 
   }
 
   const finalDocId = document_id ? parseInt(document_id) : null;
+
+  // Dosyayı şifrele
+  try {
+    const rawBuffer = fs.readFileSync(file.path);
+    const encrypted = encryptBuffer(rawBuffer);
+    fs.writeFileSync(file.path, encrypted);
+  } catch (encErr) {
+    console.error('Submission dosya şifreleme hatası:', encErr);
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    return res.status(500).json({ error: 'Dosya kaydedilirken şifreleme hatası oluştu.' });
+  }
 
   db.run(`
     INSERT INTO submissions (document_id, title, original_filename, filename, user_id, notes)
@@ -916,7 +1042,22 @@ app.get('/api/submissions/download/:id', requireAuth, (req, res) => {
       return res.status(404).json({ error: 'Dosya fiziksel olarak sunucuda bulunamadı.' });
     }
 
-    res.download(filePath, sub.original_filename);
+    try {
+      const encryptedBuffer = fs.readFileSync(filePath);
+      let decryptedBuffer;
+      try {
+        decryptedBuffer = decryptBuffer(encryptedBuffer);
+      } catch (decryptErr) {
+        decryptedBuffer = encryptedBuffer;
+      }
+
+      res.setHeader('Content-Type', getMimeType(sub.original_filename));
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(sub.original_filename)}"`);
+      res.send(decryptedBuffer);
+    } catch (readErr) {
+      console.error('Dosya okuma hatası:', readErr);
+      res.status(500).json({ error: 'Dosya okunurken sunucu hatası oluştu.' });
+    }
   });
 });
 
