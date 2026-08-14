@@ -33,12 +33,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Oturum Yönetimi (Session)
 app.use(session({
-  secret: 'ik_portal_gizli_anahtar_2026',
+  secret: process.env.SESSION_SECRET || 'ik_portal_gizli_anahtar_2026',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Localhost olduğu için false, production'da true olmalı
+    secure: process.env.NODE_ENV === 'production' || !!process.env.PORT, // Railway gibi canlı ortamlarda (HTTPS) true olur
     httpOnly: true,
+    sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 2 // 2 saat geçerli
   }
 }));
